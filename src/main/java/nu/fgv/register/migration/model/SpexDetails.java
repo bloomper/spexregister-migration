@@ -23,17 +23,19 @@ public class SpexDetails extends AbstractAuditable implements Serializable {
 
     private String title;
 
-    @ToString.Exclude
-    private byte[] poster;
+    private String posterUrl;
 
     private String posterContentType;
 
+    @ToString.Exclude
     private SpexCategory category;
 
     @Builder
     public SpexDetails(
             final Long id,
             final String title,
+            final String posterUrl,
+            final String posterContentType,
             final SpexCategory category,
             final String createdBy,
             final Date createdAt,
@@ -43,6 +45,8 @@ public class SpexDetails extends AbstractAuditable implements Serializable {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;
         this.title = title;
+        this.posterUrl = posterUrl;
+        this.posterContentType = posterContentType;
         this.category = category;
     }
 }

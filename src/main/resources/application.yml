@@ -1,7 +1,11 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.1.55:3306/spexregister?useSSL=false
-    username: root
-    password: Gammabetaalpha314
-
+    source:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://192.168.1.55:3306/spexregister?useSSL=false
+      username: root
+      password: Gammabetaalpha314
+    target:
+      url: jdbc:mysql://192.168.1.55:3307/spexregister
+      username: root
+      password: Gammabetaalpha314

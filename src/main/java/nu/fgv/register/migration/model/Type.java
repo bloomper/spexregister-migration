@@ -9,36 +9,28 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString
-public class Spex extends AbstractAuditable implements Serializable {
+public class Type extends AbstractAuditable implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Long id;
+    private String id;
 
-    private String year;
+    private Map<String, String> labels;
 
-    @ToString.Exclude
-    private Spex parent;
-
-    @ToString.Exclude
-    private SpexDetails details;
-
-    public boolean isRevival() {
-        return parent != null;
-    }
+    private TypeType type;
 
     @Builder
-    public Spex(
-            final Long id,
-            final String year,
-            final SpexDetails details,
-            final Spex parent,
+    public Type(
+            final String id,
+            final Map<String, String> labels,
+            final TypeType type,
             final String createdBy,
             final Date createdAt,
             final String lastModifiedBy,
@@ -46,8 +38,7 @@ public class Spex extends AbstractAuditable implements Serializable {
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;
-        this.year = year;
-        this.details = details;
-        this.parent = parent;
+        this.labels = labels;
+        this.type = type;
     }
 }

@@ -1,28 +1,29 @@
 package nu.fgv.register.migration.reader;
 
+import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
-import nu.fgv.register.migration.model.TaskCategory;
+import nu.fgv.register.migration.model.Tag;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TaskCategoryReader extends AbstractReader implements Reader {
+@Slf4j
+public class TagReader extends AbstractReader implements Reader {
 
-    protected TaskCategoryReader(@Qualifier("sourceJdbcTemplate") final JdbcTemplate jdbcTemplate) {
+    protected TagReader(@Qualifier("sourceJdbcTemplate") final JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
     public void read(final MigrationContext context) {
         jdbcTemplate.query("""
-                        SELECT id, name, has_actor, created_by, created_at, updated_by, updated_at
-                        FROM function_categories""",
+                        SELECT id, name, created_by, created_at, updated_by, updated_at
+                        FROM tags""",
                 rs -> {
-                    context.getTaskCategories().add(
-                            TaskCategory.builder()
+                    context.getTags().add(
+                            Tag.builder()
                                     .id(rs.getLong("id"))
                                     .name(rs.getString("name"))
-                                    .hasActor(rs.getBoolean("has_actor"))
                                     .createdBy(rs.getString("created_by"))
                                     .createdAt(rs.getDate("created_at"))
                                     .lastModifiedBy(rs.getString("updated_by"))
@@ -30,6 +31,6 @@ public class TaskCategoryReader extends AbstractReader implements Reader {
                                     .build()
                     );
                 });
-
     }
+
 }

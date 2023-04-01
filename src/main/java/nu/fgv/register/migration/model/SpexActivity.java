@@ -14,31 +14,24 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString
-public class Spex extends AbstractAuditable implements Serializable {
+public class SpexActivity extends AbstractAuditable implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;
 
-    private String year;
+    @ToString.Exclude
+    private Activity activity;
 
     @ToString.Exclude
-    private Spex parent;
-
-    @ToString.Exclude
-    private SpexDetails details;
-
-    public boolean isRevival() {
-        return parent != null;
-    }
+    private Spex spex;
 
     @Builder
-    public Spex(
+    public SpexActivity(
             final Long id,
-            final String year,
-            final SpexDetails details,
-            final Spex parent,
+            final Activity activity,
+            final Spex spex,
             final String createdBy,
             final Date createdAt,
             final String lastModifiedBy,
@@ -46,8 +39,7 @@ public class Spex extends AbstractAuditable implements Serializable {
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;
-        this.year = year;
-        this.details = details;
-        this.parent = parent;
+        this.activity = activity;
+        this.spex = spex;
     }
 }

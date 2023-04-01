@@ -8,7 +8,6 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Date;
 
 @Getter
@@ -26,8 +25,7 @@ public class SpexCategory extends AbstractAuditable implements Serializable {
 
     private String firstYear;
 
-    @ToString.Exclude
-    private byte[] logo;
+    private String logoUrl;
 
     private String logoContentType;
 
@@ -36,6 +34,8 @@ public class SpexCategory extends AbstractAuditable implements Serializable {
             final Long id,
             final String name,
             final String firstYear,
+            final String logoUrl,
+            final String logoContentType,
             final String createdBy,
             final Date createdAt,
             final String lastModifiedBy,
@@ -45,5 +45,7 @@ public class SpexCategory extends AbstractAuditable implements Serializable {
         this.id = id;
         this.name = name;
         this.firstYear = firstYear;
+        this.logoUrl = logoUrl;
+        this.logoContentType = logoContentType;
     }
 }

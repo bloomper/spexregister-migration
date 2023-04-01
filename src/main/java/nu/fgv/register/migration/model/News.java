@@ -8,37 +8,37 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString
-public class Spex extends AbstractAuditable implements Serializable {
+public class News extends AbstractAuditable implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;
 
-    private String year;
+    private Date visibleFrom;
 
-    @ToString.Exclude
-    private Spex parent;
+    private Date visibleTo;
 
-    @ToString.Exclude
-    private SpexDetails details;
+    private String subject;
 
-    public boolean isRevival() {
-        return parent != null;
-    }
+    private String text;
+
+    private Boolean published;
 
     @Builder
-    public Spex(
+    public News(
             final Long id,
-            final String year,
-            final SpexDetails details,
-            final Spex parent,
+            final Date visibleFrom,
+            final Date visibleTo,
+            final String subject,
+            final String text,
             final String createdBy,
             final Date createdAt,
             final String lastModifiedBy,
@@ -46,8 +46,9 @@ public class Spex extends AbstractAuditable implements Serializable {
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;
-        this.year = year;
-        this.details = details;
-        this.parent = parent;
+        this.visibleFrom = visibleFrom;
+        this.visibleTo = visibleTo;
+        this.subject = subject;
+        this.text = text;
     }
 }

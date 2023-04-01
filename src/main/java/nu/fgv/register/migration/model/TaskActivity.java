@@ -9,36 +9,34 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString
-public class Spex extends AbstractAuditable implements Serializable {
+public class TaskActivity extends AbstractAuditable implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;
 
-    private String year;
+    @ToString.Exclude
+    private List<Actor> actors;
 
     @ToString.Exclude
-    private Spex parent;
+    private Task task;
 
     @ToString.Exclude
-    private SpexDetails details;
-
-    public boolean isRevival() {
-        return parent != null;
-    }
+    private Activity activity;
 
     @Builder
-    public Spex(
+    public TaskActivity(
             final Long id,
-            final String year,
-            final SpexDetails details,
-            final Spex parent,
+            final Activity activity,
+            final Task task,
+            final List<Actor> actors,
             final String createdBy,
             final Date createdAt,
             final String lastModifiedBy,
@@ -46,8 +44,8 @@ public class Spex extends AbstractAuditable implements Serializable {
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;
-        this.year = year;
-        this.details = details;
-        this.parent = parent;
+        this.activity = activity;
+        this.task = task;
+        this.actors = actors;
     }
 }

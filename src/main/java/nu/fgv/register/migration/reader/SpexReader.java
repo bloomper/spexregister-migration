@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
 import nu.fgv.register.migration.model.Spex;
 import nu.fgv.register.migration.model.SpexDetails;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +14,14 @@ import java.sql.SQLException;
 @Slf4j
 public class SpexReader extends AbstractReader implements Reader {
 
-    protected SpexReader(final JdbcTemplate jdbcTemplate) {
+    protected SpexReader(@Qualifier("sourceJdbcTemplate") final JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
-    public void read(final MigrationContext context) {
+    public void read(@Qualifier("sourceJdbcTemplate") final MigrationContext context) {
         jdbcTemplate.query("""
                         SELECT s.id AS spexId, s.year AS spexYear, s.spex_category_id AS spexCategoryId, s.created_by AS spexCreatedBy, s.created_at AS spexCreatedAt, s.updated_by AS spexUpdatedBy, s.updated_at AS spexUpdatedAt,
-                        sd.id AS spexDetailsId, sd.title AS spexDetailsTitle, sd.created_by AS spexDetailsCreatedBy, sd.created_at AS spexDetailsCreatedAt, sd.updated_by AS spexDetailsUpdatedBy, sd.updated_at AS spexDetailsUpdatedAt
+                        sd.id AS spexDetailsId, sd.title AS spexDetailsTitle, sd.poster_file_name AS spexDetailsPosterFileName, sd.poster_content_type AS spexDetailsPosterContentType, sd.created_by AS spexDetailsCreatedBy, sd.created_at AS spexDetailsCreatedAt, sd.updated_by AS spexDetailsUpdatedBy, sd.updated_at AS spexDetailsUpdatedAt
                         FROM spex AS s
                         JOIN spex_details AS sd ON s.spex_detail_id = sd.id
                         WHERE s.parent_id IS NULL""",
@@ -32,6 +33,8 @@ public class SpexReader extends AbstractReader implements Reader {
                                     .details(SpexDetails.builder()
                                             .id(rs.getLong("spexDetailsId"))
                                             .title(rs.getString("spexDetailsTitle"))
+                                            .posterUrl(String.format("https://register.fgv.nu/system/posters/%s/original/%s", rs.getLong("spexId"), rs.getString("spexDetailsPosterFileName")))
+                                            .posterContentType(rs.getString("spexDetailsPosterContentType"))
                                             .category(context.getSpexCategories().stream()
                                                     .filter(c -> {
                                                         try {
@@ -93,7 +96,6 @@ public class SpexReader extends AbstractReader implements Reader {
                                 }
                             });
                 });
-
     }
 
 }

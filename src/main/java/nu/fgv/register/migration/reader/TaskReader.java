@@ -3,6 +3,7 @@ package nu.fgv.register.migration.reader;
 import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
 import nu.fgv.register.migration.model.Task;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ import java.sql.SQLException;
 @Slf4j
 public class TaskReader extends AbstractReader implements Reader {
 
-    protected TaskReader(final JdbcTemplate jdbcTemplate) {
+    protected TaskReader(@Qualifier("sourceJdbcTemplate") final JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 

@@ -23,6 +23,7 @@ public class Task extends AbstractAuditable implements Serializable {
 
     private String name;
 
+    @ToString.Exclude
     private TaskCategory category;
 
     @Builder
