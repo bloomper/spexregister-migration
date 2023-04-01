@@ -16,8 +16,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -25,8 +33,15 @@ import static org.springframework.util.StringUtils.hasText;
 @Slf4j
 public class SpexareReader extends AbstractReader implements Reader {
 
-    protected SpexareReader(@Qualifier("sourceJdbcTemplate") final JdbcTemplate jdbcTemplate) {
+    private static final String ENCRYPTION_KEY = "A8AD3BC66E66FC6C255312D70FFA547E1CE8FB8A4382BE961DFFBED0DD45B340";
+    private final Invocable invocable;
+
+    protected SpexareReader(@Qualifier("sourceJdbcTemplate") final JdbcTemplate jdbcTemplate) throws ScriptException {
         super(jdbcTemplate);
+        final ScriptEngineManager manager = new ScriptEngineManager();
+        final ScriptEngine engine = manager.getEngineByName("ruby");
+        engine.eval(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/decrypt.rb"))));
+        invocable = (Invocable) engine;
     }
 
     public void read(final MigrationContext context) {
@@ -42,7 +57,7 @@ public class SpexareReader extends AbstractReader implements Reader {
                                     .firstName(rs.getString("first_name"))
                                     .nickName(rs.getString("nick_name"))
                                     .birthDate(rs.getDate("birth_date"))
-                                    .socialSecurityNumber(rs.getString("encrypted_social_security_number")) // TODO
+                                    .socialSecurityNumber(decrypt(rs.getString("encrypted_social_security_number")).orElse(null))
                                     .graduation(rs.getString("graduation"))
                                     .comment(rs.getString("comment"))
                                     .imageUrl(String.format("https://register.fgv.nu/system/pictures/%s/original/%s", rs.getLong("id"), rs.getString("picture_file_name")))
@@ -378,6 +393,17 @@ public class SpexareReader extends AbstractReader implements Reader {
         });
 
         // TODO: User
+    }
+
+    public Optional<String> decrypt(final String encryptedValue) {
+        if (hasText(encryptedValue)) {
+            try {
+                return Optional.ofNullable((String) invocable.invokeFunction("decrypt", Base64.getDecoder().decode(encryptedValue.replaceAll("\\n", "")), ENCRYPTION_KEY));
+            } catch (Exception e) {
+                log.error("Error while invoking decrypt", e);
+            }
+        }
+        return Optional.empty();
     }
 
 }
