@@ -60,7 +60,7 @@ public class SpexareReader extends AbstractReader implements Reader {
                                     .socialSecurityNumber(decrypt(rs.getString("encrypted_social_security_number")).orElse(null))
                                     .graduation(rs.getString("graduation"))
                                     .comment(rs.getString("comment"))
-                                    .imageUrl(String.format("https://register.fgv.nu/system/pictures/%s/original/%s", rs.getLong("id"), rs.getString("picture_file_name")))
+                                    .imageUrl(hasText(rs.getString("picture_file_name")) ? String.format("https://register.fgv.nu/system/pictures/%s/original/%s", rs.getLong("id"), rs.getString("picture_file_name")) : null)
                                     .imageContentType(rs.getString("picture_content_type"))
                                     .addresses(new ArrayList<>())
                                     .memberships(new ArrayList<>())

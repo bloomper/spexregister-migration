@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 
+import static org.springframework.util.StringUtils.hasText;
+
 @Service
 @Slf4j
 public class SpexReader extends AbstractReader implements Reader {
@@ -33,7 +35,7 @@ public class SpexReader extends AbstractReader implements Reader {
                                     .details(SpexDetails.builder()
                                             .id(rs.getLong("spexDetailsId"))
                                             .title(rs.getString("spexDetailsTitle"))
-                                            .posterUrl(String.format("https://register.fgv.nu/system/posters/%s/original/%s", rs.getLong("spexId"), rs.getString("spexDetailsPosterFileName")))
+                                            .posterUrl(hasText(rs.getString("spexDetailsPosterFileName")) ? String.format("https://register.fgv.nu/system/posters/%s/original/%s", rs.getLong("spexDetailsId"), rs.getString("spexDetailsPosterFileName")) : null)
                                             .posterContentType(rs.getString("spexDetailsPosterContentType"))
                                             .category(context.getSpexCategories().stream()
                                                     .filter(c -> {

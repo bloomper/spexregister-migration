@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import static org.springframework.util.StringUtils.hasText;
+
 @Service
 public class SpexCategoryReader extends AbstractReader implements Reader {
 
@@ -23,7 +25,7 @@ public class SpexCategoryReader extends AbstractReader implements Reader {
                                     .id(rs.getLong("id"))
                                     .name(rs.getString("name"))
                                     .firstYear(rs.getString("first_year"))
-                                    .logoUrl(String.format("https://register.fgv.nu/system/logos/%s/original/%s", rs.getLong("id"), rs.getString("logo_file_name")))
+                                    .logoUrl(hasText(rs.getString("logo_file_name")) ? String.format("https://register.fgv.nu/system/logos/%s/original/%s", rs.getLong("id"), rs.getString("logo_file_name")) : null)
                                     .logoContentType(rs.getString("logo_content_type"))
                                     .createdBy(rs.getString("created_by"))
                                     .createdAt(rs.getDate("created_at"))

@@ -10,6 +10,13 @@ import nu.fgv.register.migration.reader.TagReader;
 import nu.fgv.register.migration.reader.TaskCategoryReader;
 import nu.fgv.register.migration.reader.TaskReader;
 import nu.fgv.register.migration.reader.TypeReader;
+import nu.fgv.register.migration.writer.NewsWriter;
+import nu.fgv.register.migration.writer.SpexCategoryWriter;
+import nu.fgv.register.migration.writer.SpexWriter;
+import nu.fgv.register.migration.writer.SpexareWriter;
+import nu.fgv.register.migration.writer.TagWriter;
+import nu.fgv.register.migration.writer.TaskCategoryWriter;
+import nu.fgv.register.migration.writer.TaskWriter;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -26,6 +33,13 @@ public class MigrateCommand {
     private final NewsReader newsReader;
     private final SpexareReader spexareReader;
     private final TypeReader typeReader;
+    private final SpexCategoryWriter spexCategoryWriter;
+    private final SpexWriter spexWriter;
+    private final TaskCategoryWriter taskCategoryWriter;
+    private final TaskWriter taskWriter;
+    private final TagWriter tagWriter;
+    private final NewsWriter newsWriter;
+    private final SpexareWriter spexareWriter;
 
     public MigrateCommand(final SpexCategoryReader spexCategoryReader,
                           final SpexReader spexReader,
@@ -34,7 +48,14 @@ public class MigrateCommand {
                           final TagReader tagReader,
                           final NewsReader newsReader,
                           final SpexareReader spexareReader,
-                          final TypeReader typeReader) {
+                          final TypeReader typeReader,
+                          final SpexCategoryWriter spexCategoryWriter,
+                          final SpexWriter spexWriter,
+                          final TaskCategoryWriter taskCategoryWriter,
+                          final TaskWriter taskWriter,
+                          final TagWriter tagWriter,
+                          final NewsWriter newsWriter,
+                          final SpexareWriter spexareWriter) {
         this.spexCategoryReader = spexCategoryReader;
         this.spexReader = spexReader;
         this.taskCategoryReader = taskCategoryReader;
@@ -43,6 +64,13 @@ public class MigrateCommand {
         this.newsReader = newsReader;
         this.spexareReader = spexareReader;
         this.typeReader = typeReader;
+        this.spexCategoryWriter = spexCategoryWriter;
+        this.spexWriter = spexWriter;
+        this.taskCategoryWriter = taskCategoryWriter;
+        this.taskWriter = taskWriter;
+        this.tagWriter = tagWriter;
+        this.newsWriter = newsWriter;
+        this.spexareWriter = spexareWriter;
     }
 
     @ShellMethod("Migrates Spexregister 1.x -> 2.x")
@@ -80,9 +108,38 @@ public class MigrateCommand {
         log.info("Types          : {}", context.getTypes().size());
 
         if (!dryRun) {
+            log.info("Starting to cleaning target database");
+            log.info("Cleaning spexare");
+            spexareWriter.clean();
+            log.info("Cleaning spex");
+            spexWriter.clean();
+            log.info("Cleaning spex categories");
+            spexCategoryWriter.clean();
+            log.info("Cleaning tasks");
+            taskWriter.clean();
+            log.info("Cleaning task categories");
+            taskCategoryWriter.clean();
+            log.info("Cleaning tags");
+            tagWriter.clean();
+            log.info("Cleaning news");
+            newsWriter.clean();
+            log.info("Done cleaning target database");
+
             log.info("Starting to write to target database");
-            // TODO: Truncate (not types!)
-            // TODO: Write
+            log.info("Writing news");
+            newsWriter.write(context);
+            log.info("Writing tags");
+            tagWriter.write(context);
+            log.info("Writing task categories");
+            taskCategoryWriter.write(context);
+            log.info("Writing tasks");
+            taskWriter.write(context);
+            log.info("Writing spex categories");
+            spexCategoryWriter.write(context);
+            log.info("Writing spex");
+            spexWriter.write(context);
+            log.info("Writing spexare");
+            spexareWriter.write(context);
             log.info("Done writing to target database");
         }
     }
