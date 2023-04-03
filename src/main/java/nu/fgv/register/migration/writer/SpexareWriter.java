@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import static org.springframework.util.StringUtils.hasText;
+
 @Service
 public class SpexareWriter extends AbstractWriter implements Writer {
 
@@ -30,5 +32,88 @@ public class SpexareWriter extends AbstractWriter implements Writer {
 
     @Override
     public void write(final MigrationContext context) {
+        context.getSpexare().forEach(t -> {
+            jdbcTemplate.execute(String.format("""
+                            INSERT INTO spexare
+                            (id, first_name, last_name, nick_name, birth_date, social_security_number, graduation, comment, image_content_type,
+                             created_by, created_at, last_modified_by, last_modified_at) values
+                            (%s, %s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s')""",
+                    t.getId(), hasText(t.getFirstName()) ? quote(escapeSql(t.getFirstName())) : null, hasText(t.getLastName()) ? quote(escapeSql(t.getLastName())) : null,
+                    hasText(t.getNickName()) ? quote(escapeSql(t.getNickName())) : null, t.getBirthDate() != null ? quote(t.getBirthDate()) : null,
+                    hasText(t.getSocialSecurityNumber()) ? quote(t.getSocialSecurityNumber()) : null,
+                    hasText(t.getGraduation()) ? quote(t.getGraduation()) : null, hasText(t.getComment()) ? quote(escapeSql(t.getComment())) : null,
+                    hasText(t.getImageContentType()) ? quote(t.getImageContentType()) : null,
+                    mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+
+            // Membership
+            t.getMemberships().forEach(m ->
+                    jdbcTemplate.execute(String.format("""
+                                    INSERT INTO membership
+                                    (id, year, type_id, spexare_id,
+                                     created_by, created_at, last_modified_by, last_modified_at) values
+                                    (%s, '%s', '%s', %s, '%s', '%s', '%s', '%s')""",
+                            m.getId(), m.getYear(), m.getType().getId(), t.getId(),
+                            mapUser(context.getUsers(), m.getCreatedBy()), m.getCreatedAt(), mapUser(context.getUsers(), m.getLastModifiedBy()), m.getLastModifiedAt()))
+            );
+
+            // Address
+            t.getAddresses().forEach(a ->
+                    jdbcTemplate.execute(String.format("""
+                                    INSERT INTO address
+                                    (street_address, postal_code, city, country, phone, phone_mobile, email_address, type_id, spexare_id,
+                                     created_by, created_at, last_modified_by, last_modified_at) values
+                                    (%s, %s, %s, %s, %s, %s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
+                            hasText(a.getStreetAddress()) ? quote(escapeSql(a.getStreetAddress())) : null, hasText(a.getPostalCode()) ? quote(escapeSql(a.getPostalCode())) : null,
+                            hasText(a.getCity()) ? quote(escapeSql(a.getCity())) : null, hasText(a.getCountry()) ? quote(escapeSql(a.getCountry())) : null,
+                            hasText(a.getPhone()) ? quote(escapeSql(a.getPhone())) : null, hasText(a.getPhoneMobile()) ? quote(escapeSql(a.getPhoneMobile())) : null,
+                            hasText(a.getEmailAddress()) ? quote(escapeSql(a.getEmailAddress())) : null, a.getType().getId(), t.getId(),
+                            mapUser(context.getUsers(), a.getCreatedBy()), a.getCreatedAt(), mapUser(context.getUsers(), a.getLastModifiedBy()), a.getLastModifiedAt()))
+            );
+
+            // Consent
+            t.getConsents().forEach(c ->
+                    jdbcTemplate.execute(String.format("""
+                                    INSERT INTO consent
+                                    (id, value, type_id, spexare_id,
+                                     created_by, created_at, last_modified_by, last_modified_at) values
+                                    (%s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
+                            c.getId(), c.getValue(), c.getType().getId(), t.getId(),
+                            mapUser(context.getUsers(), c.getCreatedBy()), c.getCreatedAt(), mapUser(context.getUsers(), c.getLastModifiedBy()), c.getLastModifiedAt()))
+            );
+
+            // Toggle
+            t.getToggles().forEach(g ->
+                    jdbcTemplate.execute(String.format("""
+                                    INSERT INTO toggle
+                                    (id, value, type_id, spexare_id,
+                                     created_by, created_at, last_modified_by, last_modified_at) values
+                                    (%s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
+                            g.getId(), g.getValue(), g.getType().getId(), t.getId(),
+                            mapUser(context.getUsers(), g.getCreatedBy()), g.getCreatedAt(), mapUser(context.getUsers(), g.getLastModifiedBy()), g.getLastModifiedAt()))
+            );
+
+            // Tagging
+            t.getTaggings().forEach(g ->
+                    jdbcTemplate.execute(String.format("""
+                                    INSERT INTO tagging
+                                    (tag_id, spexare_id) values
+                                    (%s, %s)""",
+                            g.getTag().getId(), t.getId()))
+            );
+
+            // Activity
+            // Spex activity
+            // Task activity
+            // Actors
+        });
+
+        // Partner
+        context.getSpexare().stream().filter(t -> t.getPartner() != null).forEach(t ->
+                jdbcTemplate.execute(String.format("""
+                                UPDATE spexare SET
+                                partner_id = %s
+                                WHERE id = %s""",
+                        t.getPartner().getId(), t.getId())));
+
     }
 }
