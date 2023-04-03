@@ -28,6 +28,6 @@ public class TaskWriter extends AbstractWriter implements Writer {
                                 values
                                 (%s, '%s', %s, '%s', '%s', '%s', '%s')""",
                         t.getId(), escapeSql(t.getName()), t.getCategory().getId(),
-                        t.getCreatedBy(), t.getCreatedAt(), t.getLastModifiedBy(), t.getLastModifiedAt())));
+                        mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt())));
     }
 }

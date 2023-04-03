@@ -37,7 +37,7 @@ public class SpexCategoryWriter extends AbstractWriter implements Writer {
                             (%s, '%s', '%s', %s, '%s', '%s', '%s', '%s')""",
                     t.getId(), escapeSql(t.getName()), t.getFirstYear(),
                     hasText(t.getLogoContentType()) ? "'" + t.getLogoContentType() + "'" : null,
-                    t.getCreatedBy(), t.getCreatedAt(), t.getLastModifiedBy(), t.getLastModifiedAt()));
+                    mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
             if (hasText(t.getLogoUrl())) {
                 try (final BufferedInputStream inputStream = new BufferedInputStream(new URL(t.getLogoUrl()).openStream())) {
                     jdbcTemplate.update(connection -> {

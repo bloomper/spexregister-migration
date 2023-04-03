@@ -28,6 +28,6 @@ public class NewsWriter extends AbstractWriter implements Writer {
                                 values
                                 (%s, '%s', '%s', '%s', 1, '%s', '%s', '%s', '%s')""",
                         t.getId(), escapeSql(t.getSubject()), escapeSql(t.getText()), t.getVisibleFrom(),
-                        t.getCreatedBy(), t.getCreatedAt(), t.getLastModifiedBy(), t.getLastModifiedAt())));
+                        mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt())));
     }
 }

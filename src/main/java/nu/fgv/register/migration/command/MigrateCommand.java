@@ -10,6 +10,7 @@ import nu.fgv.register.migration.reader.TagReader;
 import nu.fgv.register.migration.reader.TaskCategoryReader;
 import nu.fgv.register.migration.reader.TaskReader;
 import nu.fgv.register.migration.reader.TypeReader;
+import nu.fgv.register.migration.reader.UserReader;
 import nu.fgv.register.migration.writer.NewsWriter;
 import nu.fgv.register.migration.writer.SpexCategoryWriter;
 import nu.fgv.register.migration.writer.SpexWriter;
@@ -32,6 +33,7 @@ public class MigrateCommand {
     private final TagReader tagReader;
     private final NewsReader newsReader;
     private final SpexareReader spexareReader;
+    private final UserReader userReader;
     private final TypeReader typeReader;
     private final SpexCategoryWriter spexCategoryWriter;
     private final SpexWriter spexWriter;
@@ -48,6 +50,7 @@ public class MigrateCommand {
                           final TagReader tagReader,
                           final NewsReader newsReader,
                           final SpexareReader spexareReader,
+                          final UserReader userReader,
                           final TypeReader typeReader,
                           final SpexCategoryWriter spexCategoryWriter,
                           final SpexWriter spexWriter,
@@ -63,6 +66,7 @@ public class MigrateCommand {
         this.tagReader = tagReader;
         this.newsReader = newsReader;
         this.spexareReader = spexareReader;
+        this.userReader = userReader;
         this.typeReader = typeReader;
         this.spexCategoryWriter = spexCategoryWriter;
         this.spexWriter = spexWriter;
@@ -96,6 +100,8 @@ public class MigrateCommand {
         newsReader.read(context);
         log.info("Reading spexare");
         spexareReader.read(context);
+        log.info("Reading users");
+        userReader.read(context);
         log.info("Done reading from source database");
 
         log.info("Spex categories: {}", context.getSpexCategories().size());
@@ -105,10 +111,12 @@ public class MigrateCommand {
         log.info("Tags           : {}", context.getTags().size());
         log.info("News           : {}", context.getNews().size());
         log.info("Spexare        : {}", context.getSpexare().size());
+        log.info("Users          : {}", context.getUsers().size());
         log.info("Types          : {}", context.getTypes().size());
 
         if (!dryRun) {
             log.info("Starting to cleaning target database");
+            // TODO: Users
             log.info("Cleaning spexare");
             spexareWriter.clean();
             log.info("Cleaning spex");
@@ -138,6 +146,7 @@ public class MigrateCommand {
             spexCategoryWriter.write(context);
             log.info("Writing spex");
             spexWriter.write(context);
+            // TODO: Users
             log.info("Writing spexare");
             spexareWriter.write(context);
             log.info("Done writing to target database");

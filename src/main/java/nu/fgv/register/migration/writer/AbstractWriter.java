@@ -1,6 +1,9 @@
 package nu.fgv.register.migration.writer;
 
+import nu.fgv.register.migration.model.User;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.util.List;
 
 public class AbstractWriter {
 
@@ -17,4 +20,11 @@ public class AbstractWriter {
         return str.replaceAll("'", "''");
     }
 
+    static String mapUser(final List<User> users, final String uid) {
+        return users.stream()
+                .map(User::getUid)
+                .filter(u -> u.equals(uid))
+                .findFirst()
+                .orElse("system");
+    }
 }

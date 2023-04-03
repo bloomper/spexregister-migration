@@ -40,7 +40,7 @@ public class SpexWriter extends AbstractWriter implements Writer {
                     t.getDetails().getId(), escapeSql(t.getDetails().getTitle()),
                     hasText(t.getDetails().getPosterContentType()) ? "'" + t.getDetails().getPosterContentType() + "'" : null,
                     t.getDetails().getCategory().getId(),
-                    t.getCreatedBy(), t.getCreatedAt(), t.getLastModifiedBy(), t.getLastModifiedAt()));
+                    mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
             if (hasText(t.getDetails().getPosterUrl())) {
                 try (final BufferedInputStream inputStream = new BufferedInputStream(new URL(t.getDetails().getPosterUrl()).openStream())) {
                     jdbcTemplate.update(connection -> {
@@ -58,7 +58,7 @@ public class SpexWriter extends AbstractWriter implements Writer {
                             values
                             (%s, '%s', %s, '%s', '%s', '%s', '%s')""",
                     t.getId(), t.getYear(), t.getDetails().getId(),
-                    t.getCreatedBy(), t.getCreatedAt(), t.getLastModifiedBy(), t.getLastModifiedAt()));
+                    mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
         });
 
         // Revivals
@@ -69,6 +69,6 @@ public class SpexWriter extends AbstractWriter implements Writer {
                                 values
                                 (%s, '%s', %s, %s, '%s', '%s', '%s', '%s')""",
                         t.getId(), t.getYear(), t.getDetails().getId(), t.getParent().getId(),
-                        t.getCreatedBy(), t.getCreatedAt(), t.getLastModifiedBy(), t.getLastModifiedAt())));
+                        mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt())));
     }
 }
