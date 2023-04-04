@@ -77,211 +77,217 @@ public class SpexareReader extends AbstractReader implements Reader {
                 });
 
         // Addresses
-        context.getSpexare().forEach(s -> {
-            jdbcTemplate.query(String.format("""
-                            SELECT street_address, postal_code, postal_address, country, phone_home, phone_work, phone_mobile, phone_other, email_address
-                            FROM spexare
-                            WHERE id = %s""", s.getId()),
-                    rs -> {
-                        if (hasText(rs.getString("street_address")) || hasText(rs.getString("postal_address")) ||
-                                hasText(rs.getString("postal_code")) || hasText(rs.getString("phone_home")) ||
-                                hasText(rs.getString("phone_mobile")) || hasText(rs.getString("email_address"))) {
-                            s.getAddresses().add(
-                                    Address.builder()
-                                            .streetAddress(rs.getString("street_address"))
-                                            .postalCode(rs.getString("postal_code"))
-                                            .city(rs.getString("postal_address"))
-                                            .country(rs.getString("country"))
-                                            .phone(rs.getString("phone_home"))
-                                            .phoneMobile(rs.getString("phone_mobile"))
-                                            .emailAddress(rs.getString("email_address"))
-                                            .type(context.getTypes().stream().filter(t -> t.getId().equals("HOME")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type HOME")))
-                                            .spexare(s)
-                                            .createdBy(s.getCreatedBy())
-                                            .createdAt(s.getCreatedAt())
-                                            .lastModifiedBy(s.getLastModifiedBy())
-                                            .lastModifiedAt(s.getLastModifiedAt())
-                                            .build()
-                            );
+        context.getSpexare().forEach(s ->
+                jdbcTemplate.query(String.format("""
+                                SELECT street_address, postal_code, postal_address, country, phone_home, phone_work, phone_mobile, phone_other, email_address
+                                FROM spexare
+                                WHERE id = %s""", s.getId()),
+                        rs -> {
+                            if (hasText(rs.getString("street_address")) || hasText(rs.getString("postal_address")) ||
+                                    hasText(rs.getString("postal_code")) || hasText(rs.getString("phone_home")) ||
+                                    hasText(rs.getString("phone_mobile")) || hasText(rs.getString("email_address"))) {
+                                s.getAddresses().add(
+                                        Address.builder()
+                                                .streetAddress(rs.getString("street_address"))
+                                                .postalCode(rs.getString("postal_code"))
+                                                .city(rs.getString("postal_address"))
+                                                .country(rs.getString("country"))
+                                                .phone(rs.getString("phone_home"))
+                                                .phoneMobile(rs.getString("phone_mobile"))
+                                                .emailAddress(rs.getString("email_address"))
+                                                .type(context.getTypes().stream().filter(t -> t.getId().equals("HOME")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type HOME")))
+                                                .spexare(s)
+                                                .createdBy(s.getCreatedBy())
+                                                .createdAt(s.getCreatedAt())
+                                                .lastModifiedBy(s.getLastModifiedBy())
+                                                .lastModifiedAt(s.getLastModifiedAt())
+                                                .build()
+                                );
+                            }
+                            if (hasText(rs.getString("phone_work"))) {
+                                s.getAddresses().add(
+                                        Address.builder()
+                                                .phone(rs.getString("phone_work"))
+                                                .type(context.getTypes().stream().filter(t -> t.getId().equals("WORK")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type WORK")))
+                                                .spexare(s)
+                                                .createdBy(s.getCreatedBy())
+                                                .createdAt(s.getCreatedAt())
+                                                .lastModifiedBy(s.getLastModifiedBy())
+                                                .lastModifiedAt(s.getLastModifiedAt())
+                                                .build()
+                                );
+                            }
+                            if (hasText(rs.getString("phone_other"))) {
+                                s.getAddresses().add(
+                                        Address.builder()
+                                                .phone(rs.getString("phone_other"))
+                                                .type(context.getTypes().stream().filter(t -> t.getId().equals("OTHER")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type OTHER")))
+                                                .spexare(s)
+                                                .createdBy(s.getCreatedBy())
+                                                .createdAt(s.getCreatedAt())
+                                                .lastModifiedBy(s.getLastModifiedBy())
+                                                .lastModifiedAt(s.getLastModifiedAt())
+                                                .build()
+                                );
+                            }
                         }
-                        if (hasText(rs.getString("phone_work"))) {
-                            s.getAddresses().add(
-                                    Address.builder()
-                                            .phone(rs.getString("phone_work"))
-                                            .type(context.getTypes().stream().filter(t -> t.getId().equals("WORK")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type WORK")))
-                                            .spexare(s)
-                                            .createdBy(s.getCreatedBy())
-                                            .createdAt(s.getCreatedAt())
-                                            .lastModifiedBy(s.getLastModifiedBy())
-                                            .lastModifiedAt(s.getLastModifiedAt())
-                                            .build()
-                            );
-                        }
-                        if (hasText(rs.getString("phone_other"))) {
-                            s.getAddresses().add(
-                                    Address.builder()
-                                            .phone(rs.getString("phone_other"))
-                                            .type(context.getTypes().stream().filter(t -> t.getId().equals("OTHER")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type OTHER")))
-                                            .spexare(s)
-                                            .createdBy(s.getCreatedBy())
-                                            .createdAt(s.getCreatedAt())
-                                            .lastModifiedBy(s.getLastModifiedBy())
-                                            .lastModifiedAt(s.getLastModifiedAt())
-                                            .build()
-                            );
-                        }
-                    });
-        });
+                )
+        );
 
         // Consents
-        context.getSpexare().forEach(s -> {
-            jdbcTemplate.query(String.format("""
-                            SELECT publish_approval, want_circulars, want_email_circulars
-                            FROM spexare
-                            WHERE id = %s""", s.getId()),
-                    rs -> {
-                        s.getConsents().add(
-                                Consent.builder()
-                                        .value(rs.getBoolean("publish_approval"))
-                                        .type(context.getTypes().stream().filter(t -> t.getId().equals("PUBLISH")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type PUBLISH")))
-                                        .spexare(s)
-                                        .createdBy(s.getCreatedBy())
-                                        .createdAt(s.getCreatedAt())
-                                        .lastModifiedBy(s.getLastModifiedBy())
-                                        .lastModifiedAt(s.getLastModifiedAt())
-                                        .build()
-                        );
-                        s.getConsents().add(
-                                Consent.builder()
-                                        .value(rs.getBoolean("want_circulars"))
-                                        .type(context.getTypes().stream().filter(t -> t.getId().equals("CIRCULARS")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type CIRCULARS")))
-                                        .spexare(s)
-                                        .createdBy(s.getCreatedBy())
-                                        .createdAt(s.getCreatedAt())
-                                        .lastModifiedBy(s.getLastModifiedBy())
-                                        .lastModifiedAt(s.getLastModifiedAt())
-                                        .build()
-                        );
-                        s.getConsents().add(
-                                Consent.builder()
-                                        .value(rs.getBoolean("want_email_circulars"))
-                                        .type(context.getTypes().stream().filter(t -> t.getId().equals("EMAIL_CIRCULARS")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type EMAIL_CIRCULARS")))
-                                        .spexare(s)
-                                        .createdBy(s.getCreatedBy())
-                                        .createdAt(s.getCreatedAt())
-                                        .lastModifiedBy(s.getLastModifiedBy())
-                                        .lastModifiedAt(s.getLastModifiedAt())
-                                        .build()
-                        );
-                    });
-        });
+        context.getSpexare().forEach(s ->
+                jdbcTemplate.query(String.format("""
+                                SELECT publish_approval, want_circulars, want_email_circulars
+                                FROM spexare
+                                WHERE id = %s""", s.getId()),
+                        rs -> {
+                            s.getConsents().add(
+                                    Consent.builder()
+                                            .value(rs.getBoolean("publish_approval"))
+                                            .type(context.getTypes().stream().filter(t -> t.getId().equals("PUBLISH")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type PUBLISH")))
+                                            .spexare(s)
+                                            .createdBy(s.getCreatedBy())
+                                            .createdAt(s.getCreatedAt())
+                                            .lastModifiedBy(s.getLastModifiedBy())
+                                            .lastModifiedAt(s.getLastModifiedAt())
+                                            .build()
+                            );
+                            s.getConsents().add(
+                                    Consent.builder()
+                                            .value(rs.getBoolean("want_circulars"))
+                                            .type(context.getTypes().stream().filter(t -> t.getId().equals("CIRCULARS")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type CIRCULARS")))
+                                            .spexare(s)
+                                            .createdBy(s.getCreatedBy())
+                                            .createdAt(s.getCreatedAt())
+                                            .lastModifiedBy(s.getLastModifiedBy())
+                                            .lastModifiedAt(s.getLastModifiedAt())
+                                            .build()
+                            );
+                            s.getConsents().add(
+                                    Consent.builder()
+                                            .value(rs.getBoolean("want_email_circulars"))
+                                            .type(context.getTypes().stream().filter(t -> t.getId().equals("EMAIL_CIRCULARS")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type EMAIL_CIRCULARS")))
+                                            .spexare(s)
+                                            .createdBy(s.getCreatedBy())
+                                            .createdAt(s.getCreatedAt())
+                                            .lastModifiedBy(s.getLastModifiedBy())
+                                            .lastModifiedAt(s.getLastModifiedAt())
+                                            .build()
+                            );
+                        }
+                )
+        );
 
         // Toggles
-        context.getSpexare().forEach(s -> {
-            jdbcTemplate.query(String.format("""
-                            SELECT deceased, chalmers_student
-                            FROM spexare
-                            WHERE id = %s""", s.getId()),
-                    rs -> {
-                        s.getToggles().add(
-                                Toggle.builder()
-                                        .value(rs.getBoolean("deceased"))
-                                        .type(context.getTypes().stream().filter(t -> t.getId().equals("DECEASED")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type DECEASED")))
-                                        .spexare(s)
-                                        .createdBy(s.getCreatedBy())
-                                        .createdAt(s.getCreatedAt())
-                                        .lastModifiedBy(s.getLastModifiedBy())
-                                        .lastModifiedAt(s.getLastModifiedAt())
-                                        .build()
-                        );
-                        s.getToggles().add(
-                                Toggle.builder()
-                                        .value(rs.getBoolean("chalmers_student"))
-                                        .type(context.getTypes().stream().filter(t -> t.getId().equals("CHALMERS_STUDENT")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type CHALMERS_STUDENT")))
-                                        .spexare(s)
-                                        .createdBy(s.getCreatedBy())
-                                        .createdAt(s.getCreatedAt())
-                                        .lastModifiedBy(s.getLastModifiedBy())
-                                        .lastModifiedAt(s.getLastModifiedAt())
-                                        .build()
-                        );
-                    });
-        });
+        context.getSpexare().forEach(s ->
+                jdbcTemplate.query(String.format("""
+                                SELECT deceased, chalmers_student
+                                FROM spexare
+                                WHERE id = %s""", s.getId()),
+                        rs -> {
+                            s.getToggles().add(
+                                    Toggle.builder()
+                                            .value(rs.getBoolean("deceased"))
+                                            .type(context.getTypes().stream().filter(t -> t.getId().equals("DECEASED")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type DECEASED")))
+                                            .spexare(s)
+                                            .createdBy(s.getCreatedBy())
+                                            .createdAt(s.getCreatedAt())
+                                            .lastModifiedBy(s.getLastModifiedBy())
+                                            .lastModifiedAt(s.getLastModifiedAt())
+                                            .build()
+                            );
+                            s.getToggles().add(
+                                    Toggle.builder()
+                                            .value(rs.getBoolean("chalmers_student"))
+                                            .type(context.getTypes().stream().filter(t -> t.getId().equals("CHALMERS_STUDENT")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type CHALMERS_STUDENT")))
+                                            .spexare(s)
+                                            .createdBy(s.getCreatedBy())
+                                            .createdAt(s.getCreatedAt())
+                                            .lastModifiedBy(s.getLastModifiedBy())
+                                            .lastModifiedAt(s.getLastModifiedAt())
+                                            .build()
+                            );
+                        }
+                )
+        );
 
         // Memberships
-        context.getSpexare().forEach(s -> {
-            jdbcTemplate.query(String.format("""
-                            SELECT id, year, kind_id, created_by, created_at, updated_by, updated_at
-                            FROM memberships
-                            WHERE spexare_id = %s""", s.getId()),
-                    rs -> {
-                        s.getMemberships().add(
-                                Membership.builder()
-                                        .id(rs.getLong("id"))
-                                        .year(rs.getString("year"))
-                                        .type(context.getTypes().stream().filter(t -> {
-                                            try {
-                                                return rs.getInt("kind_id") == 1 ? t.getId().equals("FGV") : t.getId().equals("CING");
-                                            } catch (SQLException e) {
-                                                log.error("Unexpected SQL exception when finding type for membership", e);
-                                                return false;
-                                            }
-                                        }).findFirst().orElseThrow(() -> new RuntimeException("Could not find type FGV/CING")))
-                                        .spexare(s)
-                                        .createdBy(rs.getString("created_by"))
-                                        .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
-                                        .lastModifiedBy(rs.getString("updated_by"))
-                                        .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
-                                        .build()
-                        );
-                    });
-        });
+        context.getSpexare().forEach(s ->
+                jdbcTemplate.query(String.format("""
+                                SELECT id, year, kind_id, created_by, created_at, updated_by, updated_at
+                                FROM memberships
+                                WHERE spexare_id = %s""", s.getId()),
+                        rs -> {
+                            s.getMemberships().add(
+                                    Membership.builder()
+                                            .id(rs.getLong("id"))
+                                            .year(rs.getString("year"))
+                                            .type(context.getTypes().stream().filter(t -> {
+                                                try {
+                                                    return rs.getInt("kind_id") == 1 ? t.getId().equals("FGV") : t.getId().equals("CING");
+                                                } catch (SQLException e) {
+                                                    log.error("Unexpected SQL exception when finding type for membership", e);
+                                                    return false;
+                                                }
+                                            }).findFirst().orElseThrow(() -> new RuntimeException("Could not find type FGV/CING")))
+                                            .spexare(s)
+                                            .createdBy(rs.getString("created_by"))
+                                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                            .lastModifiedBy(rs.getString("updated_by"))
+                                            .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                                            .build()
+                            );
+                        }
+                )
+        );
 
         // Tags
-        context.getSpexare().forEach(s -> {
-            jdbcTemplate.query(String.format("""
-                            SELECT id, tag_id, created_by, created_at, updated_by, updated_at
-                            FROM taggings
-                            WHERE spexare_id = %s""", s.getId()),
-                    rs -> {
-                        s.getTaggings().add(
-                                Tagging.builder()
-                                        .id(rs.getLong("id"))
-                                        .tag(context.getTags().stream().filter(t -> {
-                                            try {
-                                                return t.getId() == rs.getInt("tag_id");
-                                            } catch (SQLException e) {
-                                                log.error("Unexpected SQL exception when finding tag for tagging", e);
-                                                return false;
-                                            }
-                                        }).findFirst().orElseThrow(() -> new RuntimeException("Could not find tag")))
-                                        .spexare(s)
-                                        .createdBy(rs.getString("created_by"))
-                                        .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
-                                        .lastModifiedBy(rs.getString("updated_by"))
-                                        .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
-                                        .build()
-                        );
-                    });
-        });
+        context.getSpexare().forEach(s ->
+                jdbcTemplate.query(String.format("""
+                                SELECT id, tag_id, created_by, created_at, updated_by, updated_at
+                                FROM taggings
+                                WHERE spexare_id = %s""", s.getId()),
+                        rs -> {
+                            s.getTaggings().add(
+                                    Tagging.builder()
+                                            .id(rs.getLong("id"))
+                                            .tag(context.getTags().stream().filter(t -> {
+                                                try {
+                                                    return t.getId() == rs.getInt("tag_id");
+                                                } catch (SQLException e) {
+                                                    log.error("Unexpected SQL exception when finding tag for tagging", e);
+                                                    return false;
+                                                }
+                                            }).findFirst().orElseThrow(() -> new RuntimeException("Could not find tag")))
+                                            .spexare(s)
+                                            .createdBy(rs.getString("created_by"))
+                                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                            .lastModifiedBy(rs.getString("updated_by"))
+                                            .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                                            .build()
+                            );
+                        }
+                )
+        );
 
         // Partner
-        context.getSpexare().forEach(s -> {
-            jdbcTemplate.query(String.format("""
-                            SELECT spouse_id
-                            FROM relationships
-                            WHERE spexare_id = %s""", s.getId()),
-                    rs -> {
-                        s.setPartner(context.getSpexare().stream().filter(p -> {
-                            try {
-                                return p.getId() == rs.getInt("spouse_id");
-                            } catch (SQLException e) {
-                                log.error("Unexpected SQL exception when finding partner for spexare", e);
-                                return false;
-                            }
-                        }).findFirst().orElseThrow(() -> new RuntimeException("Could not find partner")));
-                    });
-        });
+        context.getSpexare().forEach(s ->
+                jdbcTemplate.query(String.format("""
+                                SELECT spouse_id
+                                FROM relationships
+                                WHERE spexare_id = %s""", s.getId()),
+                        rs -> {
+                            s.setPartner(context.getSpexare().stream().filter(p -> {
+                                try {
+                                    return p.getId() == rs.getInt("spouse_id");
+                                } catch (SQLException e) {
+                                    log.error("Unexpected SQL exception when finding partner for spexare", e);
+                                    return false;
+                                }
+                            }).findFirst().orElseThrow(() -> new RuntimeException("Could not find partner")));
+                        }
+                )
+        );
 
         // Activity
         context.getSpexare().forEach(s -> {
@@ -301,7 +307,8 @@ public class SpexareReader extends AbstractReader implements Reader {
                                         .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
                                         .build()
                         );
-                    });
+                    }
+            );
 
             s.getActivities().forEach(a -> {
                 // Spex activity
@@ -328,7 +335,8 @@ public class SpexareReader extends AbstractReader implements Reader {
                                             .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
                                             .build()
                             );
-                        });
+                        }
+                );
 
                 // Task activity
                 jdbcTemplate.query(String.format("""
@@ -355,41 +363,44 @@ public class SpexareReader extends AbstractReader implements Reader {
                                             .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
                                             .build()
                             );
+                        }
+                );
 
-                            // Actor
-                            a.getTaskActivities().forEach(ta ->
-                                    jdbcTemplate.query(String.format("""
-                                                    SELECT id, role, vocal_id, created_by, created_at, updated_by, updated_at
-                                                    FROM actors
-                                                    WHERE function_activity_id = %s""", ta.getId()),
-                                            rs2 -> {
-                                                final String vocalId =
-                                                        switch (rs2.getInt("vocal_id")) {
-                                                            case 1 -> "UNKNOWN";
-                                                            case 2 -> "B1";
-                                                            case 3 -> "B2";
-                                                            case 4 -> "T1";
-                                                            case 5 -> "T2";
-                                                            case 6 -> "S1";
-                                                            case 7 -> "S2";
-                                                            case 8 -> "A1";
-                                                            case 9 -> "A2";
-                                                            default -> "UNKNOWN";
-                                                        };
-                                                ta.getActors().add(
-                                                        Actor.builder()
-                                                                .id(rs2.getLong("id"))
-                                                                .role(rs2.getString("role"))
-                                                                .vocal(context.getTypes().stream().filter(t -> t.getId().equals(vocalId)).findFirst().orElseThrow(() -> new RuntimeException("Could not find vocal")))
-                                                                .taskActivity(ta)
-                                                                .createdBy(rs2.getString("created_by"))
-                                                                .createdAt(rs2.getTimestamp("created_at").toLocalDateTime())
-                                                                .lastModifiedBy(rs2.getString("updated_by"))
-                                                                .lastModifiedAt(rs2.getTimestamp("updated_at").toLocalDateTime())
-                                                                .build()
-                                                );
-                                            }));
-                        });
+                // Actor
+                a.getTaskActivities().forEach(ta ->
+                        jdbcTemplate.query(String.format("""
+                                        SELECT id, role, vocal_id, created_by, created_at, updated_by, updated_at
+                                        FROM actors
+                                        WHERE function_activity_id = %s""", ta.getId()),
+                                rs2 -> {
+                                    final String vocalId =
+                                            switch (rs2.getInt("vocal_id")) {
+                                                case 1 -> "UNKNOWN";
+                                                case 2 -> "B1";
+                                                case 3 -> "B2";
+                                                case 4 -> "T1";
+                                                case 5 -> "T2";
+                                                case 6 -> "S1";
+                                                case 7 -> "S2";
+                                                case 8 -> "A1";
+                                                case 9 -> "A2";
+                                                default -> "UNKNOWN";
+                                            };
+                                    ta.getActors().add(
+                                            Actor.builder()
+                                                    .id(rs2.getLong("id"))
+                                                    .role(rs2.getString("role"))
+                                                    .vocal(context.getTypes().stream().filter(t -> t.getId().equals(vocalId)).findFirst().orElseThrow(() -> new RuntimeException("Could not find vocal")))
+                                                    .taskActivity(ta)
+                                                    .createdBy(rs2.getString("created_by"))
+                                                    .createdAt(rs2.getTimestamp("created_at").toLocalDateTime())
+                                                    .lastModifiedBy(rs2.getString("updated_by"))
+                                                    .lastModifiedAt(rs2.getTimestamp("updated_at").toLocalDateTime())
+                                                    .build()
+                                    );
+                                }
+                        )
+                );
             });
         });
 
