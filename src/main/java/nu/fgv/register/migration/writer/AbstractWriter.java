@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 public class AbstractWriter {
 
@@ -24,10 +25,10 @@ public class AbstractWriter {
         return str.replaceAll("'", "''");
     }
 
-    static String mapUser(final List<User> users, final String uid) {
+    static String mapUser(final List<User> users, final String id) {
         return users.stream()
+                .filter(u -> Objects.equals(u.getId(), Long.valueOf(id)))
                 .map(User::getUid)
-                .filter(u -> u.equals(uid))
                 .findFirst()
                 .orElse("system");
     }
