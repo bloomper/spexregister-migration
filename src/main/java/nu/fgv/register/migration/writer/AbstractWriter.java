@@ -3,13 +3,13 @@ package nu.fgv.register.migration.writer;
 import nu.fgv.register.migration.model.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class AbstractWriter {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     protected final JdbcTemplate jdbcTemplate;
 
@@ -36,7 +36,7 @@ public class AbstractWriter {
         return "'" + str + "'";
     }
 
-    static String quote(final Date date) {
-        return quote(DATE_FORMAT.format(date));
+    static String quote(final LocalDate date) {
+        return quote(date.format(DATE_FORMAT));
     }
 }

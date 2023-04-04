@@ -24,9 +24,9 @@ public class TaskCategoryReader extends AbstractReader implements Reader {
                                     .name(rs.getString("name"))
                                     .hasActor(rs.getBoolean("has_actor"))
                                     .createdBy(rs.getString("created_by"))
-                                    .createdAt(rs.getDate("created_at"))
+                                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                                     .lastModifiedBy(rs.getString("updated_by"))
-                                    .lastModifiedAt(rs.getDate("updated_at"))
+                                    .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
                                     .build()
                     );
                 });

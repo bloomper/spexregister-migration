@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.time.Instant;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -50,15 +51,15 @@ public class SpexReader extends AbstractReader implements Reader {
                                                     .orElse(null)
                                             )
                                             .createdBy(rs.getString("spexDetailsCreatedBy"))
-                                            .createdAt(rs.getDate("spexDetailsCreatedAt"))
+                                            .createdAt(rs.getTimestamp("spexDetailsCreatedAt").toLocalDateTime())
                                             .lastModifiedBy(rs.getString("spexDetailsUpdatedBy"))
-                                            .lastModifiedAt(rs.getDate("spexDetailsUpdatedAt"))
+                                            .lastModifiedAt(rs.getTimestamp("spexDetailsUpdatedAt").toLocalDateTime())
                                             .build()
                                     )
                                     .createdBy(rs.getString("spexCreatedBy"))
-                                    .createdAt(rs.getDate("spexCreatedAt"))
+                                    .createdAt(rs.getTimestamp("spexCreatedAt").toLocalDateTime())
                                     .lastModifiedBy(rs.getString("spexUpdatedBy"))
-                                    .lastModifiedAt(rs.getDate("spexUpdatedAt"))
+                                    .lastModifiedAt(rs.getTimestamp("spexUpdatedAt").toLocalDateTime())
                                     .build()
                     );
                 });
@@ -88,9 +89,9 @@ public class SpexReader extends AbstractReader implements Reader {
                                                     .parent(parent)
                                                     .details(parent.getDetails())
                                                     .createdBy(rs.getString("created_by"))
-                                                    .createdAt(rs.getDate("created_at"))
+                                                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                                                     .lastModifiedBy(rs.getString("updated_by"))
-                                                    .lastModifiedAt(rs.getDate("updated_at"))
+                                                    .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
                                                     .build()
                                     );
                                 } catch (SQLException e) {

@@ -41,6 +41,7 @@ public class SpexWriter extends AbstractWriter implements Writer {
                     hasText(t.getDetails().getPosterContentType()) ? quote(t.getDetails().getPosterContentType()) : null,
                     t.getDetails().getCategory().getId(),
                     mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+
             if (hasText(t.getDetails().getPosterUrl())) {
                 try (final BufferedInputStream inputStream = new BufferedInputStream(new URL(t.getDetails().getPosterUrl()).openStream())) {
                     jdbcTemplate.update(connection -> {
@@ -52,6 +53,7 @@ public class SpexWriter extends AbstractWriter implements Writer {
                     log.error("Unexpected error when writing poster for spex", e);
                 }
             }
+
             jdbcTemplate.execute(String.format("""
                             INSERT INTO spex
                             (id, year, details_id, created_by, created_at, last_modified_by, last_modified_at)

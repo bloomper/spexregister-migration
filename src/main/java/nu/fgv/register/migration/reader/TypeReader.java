@@ -2,14 +2,11 @@ package nu.fgv.register.migration.reader;
 
 import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
-import nu.fgv.register.migration.model.Task;
 import nu.fgv.register.migration.model.Type;
 import nu.fgv.register.migration.model.TypeType;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-
-import java.sql.SQLException;
 
 @Service
 @Slf4j
@@ -29,9 +26,9 @@ public class TypeReader extends AbstractReader implements Reader {
                                     .id(rs.getString("id"))
                                     .type(TypeType.valueOf(rs.getString("type")))
                                     .createdBy(rs.getString("created_by"))
-                                    .createdAt(rs.getDate("created_at"))
+                                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                                     .lastModifiedBy(rs.getString("last_modified_by"))
-                                    .lastModifiedAt(rs.getDate("last_modified_at"))
+                                    .lastModifiedAt(rs.getTimestamp("last_modified_at") != null ? rs.getTimestamp("last_modified_at").toLocalDateTime() : null)
                                     .build()
                     );
                 });

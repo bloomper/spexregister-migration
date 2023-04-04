@@ -39,9 +39,9 @@ public class TaskReader extends AbstractReader implements Reader {
                                             .orElse(null)
                                     )
                                     .createdBy(rs.getString("created_by"))
-                                    .createdAt(rs.getDate("created_at"))
+                                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                                     .lastModifiedBy(rs.getString("updated_by"))
-                                    .lastModifiedAt(rs.getDate("updated_at"))
+                                    .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
                                     .build()
                     );
                 });

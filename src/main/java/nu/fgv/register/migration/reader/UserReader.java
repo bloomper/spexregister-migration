@@ -2,7 +2,6 @@ package nu.fgv.register.migration.reader;
 
 import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
-import nu.fgv.register.migration.model.Tag;
 import nu.fgv.register.migration.model.User;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,9 +25,9 @@ public class UserReader extends AbstractReader implements Reader {
                                     .id(rs.getLong("id"))
                                     .uid(rs.getString("username"))
                                     .createdBy(rs.getString("created_by"))
-                                    .createdAt(rs.getDate("created_at"))
+                                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                                     .lastModifiedBy(rs.getString("updated_by"))
-                                    .lastModifiedAt(rs.getDate("updated_at"))
+                                    .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
                                     .build()
                     );
                 });

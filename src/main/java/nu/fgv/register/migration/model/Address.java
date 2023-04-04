@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -53,9 +53,9 @@ public class Address extends AbstractAuditable implements Serializable {
             final Type type,
             final Spexare spexare,
             final String createdBy,
-            final Date createdAt,
+            final LocalDateTime createdAt,
             final String lastModifiedBy,
-            final Date lastModifiedAt
+            final LocalDateTime lastModifiedAt
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;

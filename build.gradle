@@ -26,12 +26,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.shell:spring-shell-starter'
-	implementation 'org.jruby:jruby:9.4.2.0'
+
 	compileOnly 'org.projectlombok:lombok'
+
 	runtimeOnly 'mysql:mysql-connector-java:5.1.49'
 	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'org.jruby:jruby:9.4.2.0'
+
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 dependencyManagement {

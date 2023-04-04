@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -40,9 +40,9 @@ public class News extends AbstractAuditable implements Serializable {
             final String subject,
             final String text,
             final String createdBy,
-            final Date createdAt,
+            final LocalDateTime createdAt,
             final String lastModifiedBy,
-            final Date lastModifiedAt
+            final LocalDateTime lastModifiedAt
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;

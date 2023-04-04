@@ -1,13 +1,20 @@
 package nu.fgv.register.migration.writer;
 
+import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
+import nu.fgv.register.migration.model.SpexActivity;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedInputStream;
+import java.net.URL;
+import java.sql.PreparedStatement;
+
 import static org.springframework.util.StringUtils.hasText;
 
 @Service
+@Slf4j
 public class SpexareWriter extends AbstractWriter implements Writer {
 
     protected SpexareWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate) {
@@ -44,6 +51,18 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                     hasText(t.getGraduation()) ? quote(t.getGraduation()) : null, hasText(t.getComment()) ? quote(escapeSql(t.getComment())) : null,
                     hasText(t.getImageContentType()) ? quote(t.getImageContentType()) : null,
                     mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+
+            if (hasText(t.getImageUrl())) {
+                try (final BufferedInputStream inputStream = new BufferedInputStream(new URL(t.getImageUrl()).openStream())) {
+                    jdbcTemplate.update(connection -> {
+                        PreparedStatement preparedStatement = connection.prepareStatement(String.format("UPDATE spexare SET image = ? WHERE id = %s", t.getId()));
+                        preparedStatement.setBlob(1, inputStream);
+                        return preparedStatement;
+                    });
+                } catch (Exception e) {
+                    log.error("Unexpected error when writing image for spexare", e);
+                }
+            }
 
             // Membership
             t.getMemberships().forEach(m ->
@@ -102,9 +121,49 @@ public class SpexareWriter extends AbstractWriter implements Writer {
             );
 
             // Activity
-            // Spex activity
-            // Task activity
-            // Actors
+            t.getActivities().forEach(a -> {
+                jdbcTemplate.execute(String.format("""
+                                INSERT INTO activity
+                                (id, spexare_id,
+                                 created_by, created_at, last_modified_by, last_modified_at) values
+                                (%s, %s, '%s', '%s', '%s', '%s')""",
+                        a.getId(), a.getSpexare().getId(),
+                        mapUser(context.getUsers(), a.getCreatedBy()), a.getCreatedAt(), mapUser(context.getUsers(), a.getLastModifiedBy()), a.getLastModifiedAt()));
+
+                // Spex activity
+                if (a.getSpexActivity() != null) {
+                    final SpexActivity sa = a.getSpexActivity();
+
+                    jdbcTemplate.execute(String.format("""
+                                    INSERT INTO spex_activity
+                                    (id, activity_id, spex_id,
+                                     created_by, created_at, last_modified_by, last_modified_at) values
+                                    (%s, %s, %s, '%s', '%s', '%s', '%s')""",
+                            sa.getId(), a.getId(), sa.getSpex().getId(),
+                            mapUser(context.getUsers(), sa.getCreatedBy()), sa.getCreatedAt(), mapUser(context.getUsers(), sa.getLastModifiedBy()), sa.getLastModifiedAt()));
+                }
+
+                // Task activity
+                a.getTaskActivities().forEach(ta -> {
+                    jdbcTemplate.execute(String.format("""
+                                    INSERT INTO task_activity
+                                    (id, activity_id, task_id,
+                                     created_by, created_at, last_modified_by, last_modified_at) values
+                                    (%s, %s, %s, '%s', '%s', '%s', '%s')""",
+                            ta.getId(), a.getId(), ta.getTask().getId(),
+                            mapUser(context.getUsers(), ta.getCreatedBy()), ta.getCreatedAt(), mapUser(context.getUsers(), ta.getLastModifiedBy()), ta.getLastModifiedAt()));
+
+                    // Actors
+                    ta.getActors().forEach(ac ->
+                            jdbcTemplate.execute(String.format("""
+                                            INSERT INTO actor
+                                            (id, role, vocal_id, task_activity_id,
+                                             created_by, created_at, last_modified_by, last_modified_at) values
+                                            (%s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
+                                    ac.getId(), hasText(ac.getRole()) ? quote(escapeSql(ac.getRole())) : null, ac.getVocal().getId(), ta.getId(),
+                                    mapUser(context.getUsers(), ac.getCreatedBy()), ac.getCreatedAt(), mapUser(context.getUsers(), ac.getLastModifiedBy()), ac.getLastModifiedAt())));
+                });
+            });
         });
 
         // Partner
