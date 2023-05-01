@@ -3,6 +3,7 @@ package nu.fgv.register.migration.writer;
 import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
 import nu.fgv.register.migration.model.SpexActivity;
+import nu.fgv.register.migration.util.CryptoService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedInputStream;
 import java.net.URL;
 import java.sql.PreparedStatement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -17,8 +20,13 @@ import static org.springframework.util.StringUtils.hasText;
 @Slf4j
 public class SpexareWriter extends AbstractWriter implements Writer {
 
-    protected SpexareWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate) {
+    private static final DateTimeFormatter BIRTH_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private final CryptoService cryptoService;
+
+    protected SpexareWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate,
+                            final CryptoService cryptoService) {
         super(jdbcTemplate);
+        this.cryptoService = cryptoService;
     }
 
     @Override
@@ -42,12 +50,11 @@ public class SpexareWriter extends AbstractWriter implements Writer {
         context.getSpexare().forEach(t -> {
             jdbcTemplate.execute(String.format("""
                             INSERT INTO spexare
-                            (id, first_name, last_name, nick_name, birth_date, social_security_number, graduation, comment, image_content_type,
+                            (id, first_name, last_name, nick_name, social_security_number, graduation, comment, image_content_type,
                              created_by, created_at, last_modified_by, last_modified_at) values
-                            (%s, %s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s')""",
+                            (%s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s')""",
                     t.getId(), hasText(t.getFirstName()) ? quote(escapeSql(t.getFirstName())) : null, hasText(t.getLastName()) ? quote(escapeSql(t.getLastName())) : null,
-                    hasText(t.getNickName()) ? quote(escapeSql(t.getNickName())) : null, t.getBirthDate() != null ? quote(t.getBirthDate()) : null,
-                    hasText(t.getSocialSecurityNumber()) ? quote(t.getSocialSecurityNumber()) : null,
+                    hasText(t.getNickName()) ? quote(escapeSql(t.getNickName())) : null, constructSocialSecurityNumber(t.getBirthDate(), t.getSocialSecurityNumber()),
                     hasText(t.getGraduation()) ? quote(t.getGraduation()) : null, hasText(t.getComment()) ? quote(escapeSql(t.getComment())) : null,
                     hasText(t.getImageContentType()) ? quote(t.getImageContentType()) : null,
                     mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
@@ -174,5 +181,13 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                                 WHERE id = %s""",
                         t.getPartner().getId(), t.getId())));
 
+    }
+
+    private String constructSocialSecurityNumber(final LocalDate birthDate, final String socialSecurityNumber) {
+        if (birthDate != null) {
+            return quote(cryptoService.encrypt(String.format("%s%s", birthDate.format(BIRTH_DATE_FORMATTER), hasText(socialSecurityNumber) ? "-" + socialSecurityNumber : "")));
+        } else {
+            return null;
+        }
     }
 }
