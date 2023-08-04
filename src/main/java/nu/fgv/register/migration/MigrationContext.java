@@ -2,6 +2,7 @@ package nu.fgv.register.migration;
 
 import lombok.Getter;
 import lombok.Setter;
+import nu.fgv.register.migration.model.Event;
 import nu.fgv.register.migration.model.News;
 import nu.fgv.register.migration.model.Spex;
 import nu.fgv.register.migration.model.SpexCategory;
@@ -27,5 +28,6 @@ public class MigrationContext {
     private final List<News> news = new ArrayList<>();
     private final List<Spexare> spexare = new ArrayList<>();
     private final List<User> users = new ArrayList<>();
+    private final List<Event> events = new ArrayList<>();
     private final List<Type> types = new ArrayList<>();
 }
