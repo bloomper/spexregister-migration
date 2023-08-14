@@ -20,6 +20,7 @@ import nu.fgv.register.migration.writer.SpexareWriter;
 import nu.fgv.register.migration.writer.TagWriter;
 import nu.fgv.register.migration.writer.TaskCategoryWriter;
 import nu.fgv.register.migration.writer.TaskWriter;
+import nu.fgv.register.migration.writer.UserWriter;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -45,6 +46,7 @@ public class MigrateCommand {
     private final TagWriter tagWriter;
     private final NewsWriter newsWriter;
     private final SpexareWriter spexareWriter;
+    private final UserWriter userWriter;
     private final EventWriter eventWriter;
 
     public MigrateCommand(final SpexCategoryReader spexCategoryReader,
@@ -64,6 +66,7 @@ public class MigrateCommand {
                           final TagWriter tagWriter,
                           final NewsWriter newsWriter,
                           final SpexareWriter spexareWriter,
+                          final UserWriter userWriter,
                           final EventWriter eventWriter) {
         this.spexCategoryReader = spexCategoryReader;
         this.spexReader = spexReader;
@@ -82,6 +85,7 @@ public class MigrateCommand {
         this.tagWriter = tagWriter;
         this.newsWriter = newsWriter;
         this.spexareWriter = spexareWriter;
+        this.userWriter = userWriter;
         this.eventWriter = eventWriter;
     }
 
@@ -127,9 +131,10 @@ public class MigrateCommand {
 
         if (!dryRun) {
             log.info("Starting to cleaning target database");
-            // TODO: Users
             log.info("Cleaning events");
             eventWriter.clean();
+            log.info("Cleaning users");
+            userWriter.clean();
             log.info("Cleaning spexare");
             spexareWriter.clean();
             log.info("Cleaning spex");
@@ -159,9 +164,10 @@ public class MigrateCommand {
             spexCategoryWriter.write(context);
             log.info("Writing spex");
             spexWriter.write(context);
-            // TODO: Users
             log.info("Writing spexare");
             spexareWriter.write(context);
+            log.info("Writing users");
+            userWriter.write(context);
             log.info("Writing events");
             eventWriter.write(context);
             log.info("Done writing to target database");

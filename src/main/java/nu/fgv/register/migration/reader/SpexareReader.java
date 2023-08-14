@@ -403,8 +403,6 @@ public class SpexareReader extends AbstractReader implements Reader {
                 );
             });
         });
-
-        // TODO: User
     }
 
     public Optional<String> decrypt(final String encryptedValue) {

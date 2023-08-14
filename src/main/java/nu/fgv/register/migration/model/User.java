@@ -9,6 +9,8 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,10 +25,24 @@ public class User extends AbstractAuditable implements Serializable {
 
     private String uid;
 
+    private String password;
+
+    private String passwordSalt;
+
+    private Integer spexareId;
+
+    private String state;
+
+    private List<String> groups = new ArrayList<>();
+
     @Builder
     public User(
             final Long id,
             final String uid,
+            final String password,
+            final String passwordSalt,
+            final Integer spexareId,
+            final String state,
             final String createdBy,
             final LocalDateTime createdAt,
             final String lastModifiedBy,
@@ -35,5 +51,9 @@ public class User extends AbstractAuditable implements Serializable {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;
         this.uid = uid;
+        this.password = password;
+        this.passwordSalt = passwordSalt;
+        this.spexareId = spexareId;
+        this.state = state;
     }
 }

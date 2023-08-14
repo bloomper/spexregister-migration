@@ -17,13 +17,17 @@ public class UserReader extends AbstractReader implements Reader {
 
     public void read(final MigrationContext context) {
         jdbcTemplate.query("""
-                        SELECT id, username, created_by, created_at, updated_by, updated_at
+                        SELECT id, username, crypted_password, password_salt, spexare_id, state, created_by, created_at, updated_by, updated_at
                         FROM users""",
                 rs -> {
                     context.getUsers().add(
                             User.builder()
                                     .id(rs.getLong("id"))
                                     .uid(rs.getString("username"))
+                                    .password(rs.getString("crypted_password"))
+                                    .passwordSalt(rs.getString("password_salt"))
+                                    .spexareId(rs.getInt("spexare_id") != 0 ? rs.getInt("spexare_id") : null)
+                                    .state(rs.getString("state"))
                                     .createdBy(rs.getString("created_by"))
                                     .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                                     .lastModifiedBy(rs.getString("updated_by"))
@@ -31,6 +35,17 @@ public class UserReader extends AbstractReader implements Reader {
                                     .build()
                     );
                 });
+
+        // Groups
+        context.getUsers().forEach(u ->
+                jdbcTemplate.query(String.format("""
+                                SELECT name
+                                FROM user_groups_users AS ugu
+                                LEFT JOIN user_groups AS ug ON ug.id = ugu.user_group_id
+                                WHERE user_id = %s""", u.getId()),
+                        rs -> {
+                            u.getGroups().add(rs.getString("name"));
+                        }));
     }
 
 }
