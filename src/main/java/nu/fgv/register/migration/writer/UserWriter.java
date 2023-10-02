@@ -26,11 +26,10 @@ public class UserWriter extends AbstractWriter implements Writer {
         context.getUsers().forEach(t ->
                 jdbcTemplate.execute(String.format("""
                                 INSERT INTO user
-                                (id, uid, password, state, created_by, created_at, last_modified_by, last_modified_at)
+                                (id, uid, state, created_by, created_at, last_modified_by, last_modified_at)
                                 values
-                                (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s')""",
-                        t.getId(), escapeSql(t.getUid()),
-                        constructPassword(t.getPassword(), t.getPasswordSalt()), mapState(t.getState()),
+                                (%s, '%s', '%s', '%s', '%s', '%s', '%s')""",
+                        t.getId(), escapeSql(t.getUid()), mapState(t.getState()),
                         mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()))
         );
 
@@ -55,9 +54,6 @@ public class UserWriter extends AbstractWriter implements Writer {
                                 WHERE id = %s""",
                         t.getSpexareId(), t.getId()))
         );
-
-        // Permissions
-        // TODO (probably as part of groups above)
     }
 
     private Integer mapGroup(final String group) {
@@ -87,7 +83,4 @@ public class UserWriter extends AbstractWriter implements Writer {
         }
     }
 
-    private String constructPassword(final String password, final String passwordSalt) {
-        return String.format("{legacy}$%s$%s", passwordSalt, password);
-    }
 }
