@@ -2,16 +2,20 @@ package nu.fgv.register.migration.writer;
 
 import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
+import nu.fgv.register.migration.util.PermissionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class UserWriter extends AbstractWriter implements Writer {
 
-    protected UserWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate) {
-        super(jdbcTemplate);
+    protected UserWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate,
+                         final PermissionService permissionService) {
+        super(jdbcTemplate, permissionService);
     }
 
     @Override
@@ -23,15 +27,19 @@ public class UserWriter extends AbstractWriter implements Writer {
 
     @Override
     public void write(final MigrationContext context) {
-        context.getUsers().forEach(t ->
-                jdbcTemplate.execute(String.format("""
-                                INSERT INTO user
-                                (id, uid, state, created_by, created_at, last_modified_by, last_modified_at)
-                                values
-                                (%s, '%s', '%s', '%s', '%s', '%s', '%s')""",
-                        t.getId(), escapeSql(t.getUid()), mapState(t.getState()),
-                        mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()))
-        );
+        context.getUsers().forEach(t -> {
+            jdbcTemplate.execute(String.format("""
+                            INSERT INTO user
+                            (id, uid, state, created_by, created_at, last_modified_by, last_modified_at)
+                            values
+                            (%s, '%s', '%s', '%s', '%s', '%s', '%s')""",
+                    t.getId(), escapeSql(t.getUid()), mapState(t.getState()),
+                    mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+
+            final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.user.User", t.getId());
+
+            permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
+        });
 
         // Groups
         context.getUsers().stream().filter(t -> !t.getGroups().isEmpty()).forEach(t ->
@@ -44,7 +52,6 @@ public class UserWriter extends AbstractWriter implements Writer {
                                 t.getId(), mapGroup(g),
                                 mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt()))
                 ));
-
 
         // Spexare
         context.getUsers().stream().filter(t -> t.getSpexareId() != null).forEach(t ->

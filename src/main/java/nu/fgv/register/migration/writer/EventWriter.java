@@ -1,6 +1,7 @@
 package nu.fgv.register.migration.writer;
 
 import nu.fgv.register.migration.MigrationContext;
+import nu.fgv.register.migration.util.PermissionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -8,8 +9,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class EventWriter extends AbstractWriter implements Writer {
 
-    protected EventWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate) {
-        super(jdbcTemplate);
+    protected EventWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate,
+                          final PermissionService permissionService) {
+        super(jdbcTemplate, permissionService);
     }
 
     @Override

@@ -1,8 +1,13 @@
 package nu.fgv.register.migration.writer;
 
 import nu.fgv.register.migration.model.User;
+import nu.fgv.register.migration.util.PermissionService;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.acls.domain.GrantedAuthoritySid;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.model.ObjectIdentity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -12,10 +17,19 @@ public class AbstractWriter {
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    protected final JdbcTemplate jdbcTemplate;
+    static final String ROLE_ADMIN = "ROLE_spexregister_ADMIN";
+    static final String ROLE_EDITOR = "ROLE_spexregister_EDITOR";
+    static final String ROLE_USER = "ROLE_spexregister_USER";
+    static final GrantedAuthoritySid ROLE_ADMIN_SID = new GrantedAuthoritySid(ROLE_ADMIN);
+    static final GrantedAuthoritySid ROLE_EDITOR_SID = new GrantedAuthoritySid(ROLE_EDITOR);
+    static final GrantedAuthoritySid ROLE_USER_SID = new GrantedAuthoritySid(ROLE_USER);
 
-    protected AbstractWriter(final JdbcTemplate jdbcTemplate) {
+    final JdbcTemplate jdbcTemplate;
+    final PermissionService permissionService;
+
+    protected AbstractWriter(final JdbcTemplate jdbcTemplate, final PermissionService permissionService) {
         this.jdbcTemplate = jdbcTemplate;
+        this.permissionService = permissionService;
     }
 
     static String escapeSql(String str) {
@@ -39,5 +53,9 @@ public class AbstractWriter {
 
     static String quote(final LocalDate date) {
         return quote(date.format(DATE_FORMAT));
+    }
+
+    static ObjectIdentity toObjectIdentity(final String clazz, final Serializable id) {
+        return new ObjectIdentityImpl(clazz, id);
     }
 }

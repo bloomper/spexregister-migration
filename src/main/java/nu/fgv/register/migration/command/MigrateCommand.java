@@ -48,6 +48,7 @@ public class MigrateCommand {
     private final SpexareWriter spexareWriter;
     private final UserWriter userWriter;
     private final EventWriter eventWriter;
+    private final EventWriter globalWriter;
 
     public MigrateCommand(final SpexCategoryReader spexCategoryReader,
                           final SpexReader spexReader,
@@ -67,7 +68,8 @@ public class MigrateCommand {
                           final NewsWriter newsWriter,
                           final SpexareWriter spexareWriter,
                           final UserWriter userWriter,
-                          final EventWriter eventWriter) {
+                          final EventWriter eventWriter,
+                          final EventWriter globalWriter) {
         this.spexCategoryReader = spexCategoryReader;
         this.spexReader = spexReader;
         this.taskCategoryReader = taskCategoryReader;
@@ -87,6 +89,7 @@ public class MigrateCommand {
         this.spexareWriter = spexareWriter;
         this.userWriter = userWriter;
         this.eventWriter = eventWriter;
+        this.globalWriter = globalWriter;
     }
 
     @ShellMethod("Migrates Spexregister 1.x -> 2.x")
@@ -131,6 +134,8 @@ public class MigrateCommand {
 
         if (!dryRun) {
             log.info("Starting to cleaning target database");
+            log.info("Cleaning global");
+            globalWriter.clean();
             log.info("Cleaning events");
             eventWriter.clean();
             log.info("Cleaning users");

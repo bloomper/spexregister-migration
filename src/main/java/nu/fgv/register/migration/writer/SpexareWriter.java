@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
 import nu.fgv.register.migration.model.SpexActivity;
 import nu.fgv.register.migration.util.CryptoService;
+import nu.fgv.register.migration.util.PermissionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,9 @@ public class SpexareWriter extends AbstractWriter implements Writer {
     private final CryptoService cryptoService;
 
     protected SpexareWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate,
+                            final PermissionService permissionService,
                             final CryptoService cryptoService) {
-        super(jdbcTemplate);
+        super(jdbcTemplate, permissionService);
         this.cryptoService = cryptoService;
     }
 
