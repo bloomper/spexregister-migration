@@ -33,6 +33,10 @@ public class Spexare extends AbstractAuditable implements Serializable {
 
     private String socialSecurityNumber;
 
+    private Boolean deceased;
+
+    private Boolean published;
+
     private String graduation;
 
     private String comment;
@@ -70,6 +74,8 @@ public class Spexare extends AbstractAuditable implements Serializable {
             final String nickName,
             final LocalDate birthDate,
             final String socialSecurityNumber,
+            final Boolean deceased,
+            final Boolean published,
             final String graduation,
             final String comment,
             final String imageUrl,
@@ -93,6 +99,8 @@ public class Spexare extends AbstractAuditable implements Serializable {
         this.nickName = nickName;
         this.birthDate = birthDate;
         this.socialSecurityNumber = socialSecurityNumber;
+        this.deceased = deceased;
+        this.published = published;
         this.graduation = graduation;
         this.comment = comment;
         this.imageUrl = imageUrl;

@@ -47,7 +47,8 @@ public class SpexareReader extends AbstractReader implements Reader {
     public void read(final MigrationContext context) {
         jdbcTemplate.query("""
                         SELECT id, last_name, first_name, nick_name, birth_date, encrypted_social_security_number,
-                        graduation, comment, picture_file_name, picture_content_type, created_by, created_at, updated_by, updated_at
+                        deceased, publish_approval, graduation, comment, picture_file_name, picture_content_type,
+                        created_by, created_at, updated_by, updated_at
                         FROM spexare""",
                 rs -> {
                     context.getSpexare().add(
@@ -58,6 +59,8 @@ public class SpexareReader extends AbstractReader implements Reader {
                                     .nickName(rs.getString("nick_name"))
                                     .birthDate(rs.getDate("birth_date") != null ? rs.getDate("birth_date").toLocalDate() : null)
                                     .socialSecurityNumber(decrypt(rs.getString("encrypted_social_security_number")).orElse(null))
+                                    .deceased(rs.getBoolean("deceased"))
+                                    .published(rs.getBoolean("publish_approval"))
                                     .graduation(rs.getString("graduation"))
                                     .comment(rs.getString("comment"))
                                     .imageUrl(hasText(rs.getString("picture_file_name")) ? String.format("https://register.fgv.nu/system/pictures/%s/original/%s", rs.getLong("id"), encodeUrl(rs.getString("picture_file_name"))) : null)
@@ -137,21 +140,10 @@ public class SpexareReader extends AbstractReader implements Reader {
         // Consents
         context.getSpexare().forEach(s ->
                 jdbcTemplate.query(String.format("""
-                                SELECT publish_approval, want_circulars, want_email_circulars
+                                SELECT want_circulars, want_email_circulars
                                 FROM spexare
                                 WHERE id = %s""", s.getId()),
                         rs -> {
-                            s.getConsents().add(
-                                    Consent.builder()
-                                            .value(rs.getBoolean("publish_approval"))
-                                            .type(context.getTypes().stream().filter(t -> t.getId().equals("PUBLISH")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type PUBLISH")))
-                                            .spexare(s)
-                                            .createdBy(s.getCreatedBy())
-                                            .createdAt(s.getCreatedAt())
-                                            .lastModifiedBy(s.getLastModifiedBy())
-                                            .lastModifiedAt(s.getLastModifiedAt())
-                                            .build()
-                            );
                             s.getConsents().add(
                                     Consent.builder()
                                             .value(rs.getBoolean("want_circulars"))
@@ -181,21 +173,10 @@ public class SpexareReader extends AbstractReader implements Reader {
         // Toggles
         context.getSpexare().forEach(s ->
                 jdbcTemplate.query(String.format("""
-                                SELECT deceased, chalmers_student
+                                SELECT chalmers_student
                                 FROM spexare
                                 WHERE id = %s""", s.getId()),
                         rs -> {
-                            s.getToggles().add(
-                                    Toggle.builder()
-                                            .value(rs.getBoolean("deceased"))
-                                            .type(context.getTypes().stream().filter(t -> t.getId().equals("DECEASED")).findFirst().orElseThrow(() -> new RuntimeException("Could not find type DECEASED")))
-                                            .spexare(s)
-                                            .createdBy(s.getCreatedBy())
-                                            .createdAt(s.getCreatedAt())
-                                            .lastModifiedBy(s.getLastModifiedBy())
-                                            .lastModifiedAt(s.getLastModifiedAt())
-                                            .build()
-                            );
                             s.getToggles().add(
                                     Toggle.builder()
                                             .value(rs.getBoolean("chalmers_student"))
