@@ -2,13 +2,13 @@ spring:
   datasource:
     source:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://192.168.1.55:3306/spexregister?useSSL=false
-      username: root
-      password: Gammabetaalpha314
+      url: ${SOURCE_DATABASE_URL}
+      username: ${SOURCE_DATABASE_USERNAME}
+      password: ${SOURCE_DATABASE_PASSWORD}
     target:
-      url: jdbc:mysql://192.168.1.55:3307/spexregister
-      username: root
-      password: Gammabetaalpha314
+      url: ${TARGET_DATABASE_URL}
+      username: ${TARGET_DATABASE_USERNAME}
+      password: ${TARGET_DATABASE_PASSWORD}
   shell:
     interactive:
       enabled: true
@@ -19,3 +19,11 @@ spexregister:
     secret-key: ${SECRET_KEY}
     initialization-vector: ${IV}
     algorithm: "AES/CFB/PKCS5Padding"
+  keycloak:
+    url: ${KEYCLOAK_URL}
+    realm: ${KEYCLOAK_REALM}
+    admin:
+      client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
+      client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+    client:
+      client-id: ${KEYCLOAK_CLIENT_CLIENT_ID}

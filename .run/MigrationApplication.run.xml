@@ -7,6 +7,66 @@
         <option name="name" value="SECRET_KEY" />
         <option name="value" value="TODO" />
       </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="IV" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="KEYCLOAK_URL" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="KEYCLOAK_REALM" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="KEYCLOAK_ADMIN_CLIENT_ID" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="KEYCLOAK_ADMIN_CLIENT_SECRET" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="KEYCLOAK_CLIENT_CLIENT_ID" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="SOURCE_DATABASE_URL" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="SOURCE_DATABASE_USERNAME" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="SOURCE_DATABASE_PASSWORD" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="TARGET_DATABASE_URL" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="TARGET_DATABASE_USERNAME" />
+        <option name="value" value="TODO" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="TARGET_DATABASE_PASSWORD" />
+        <option name="value" value="TODO" />
+      </param>
     </additionalParameters>
     <module name="nu.fgv.register.spexregister-migration.main" />
     <selectedOptions>
