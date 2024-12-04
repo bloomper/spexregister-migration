@@ -7,6 +7,8 @@ import nu.fgv.register.migration.util.CryptoService;
 import nu.fgv.register.migration.util.PermissionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
@@ -52,14 +54,23 @@ public class SpexareWriter extends AbstractWriter implements Writer {
         context.getSpexare().forEach(t -> {
             jdbcTemplate.execute(String.format("""
                             INSERT INTO spexare
-                            (id, first_name, last_name, nick_name, social_security_number, graduation, comment, image_content_type,
+                            (id, first_name, last_name, nick_name, social_security_number, deceased, published, graduation, comment, image_content_type,
                              created_by, created_at, last_modified_by, last_modified_at) values
                             (%s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s')""",
                     t.getId(), hasText(t.getFirstName()) ? quote(escapeSql(t.getFirstName())) : null, hasText(t.getLastName()) ? quote(escapeSql(t.getLastName())) : null,
                     hasText(t.getNickName()) ? quote(escapeSql(t.getNickName())) : null, constructSocialSecurityNumber(t.getBirthDate(), t.getSocialSecurityNumber()),
+                    t.getDeceased(), t.getPublished(),
                     hasText(t.getGraduation()) ? quote(t.getGraduation()) : null, hasText(t.getComment()) ? quote(escapeSql(t.getComment())) : null,
                     hasText(t.getImageContentType()) ? quote(t.getImageContentType()) : null,
                     mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+
+            final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spexare.Spexare", t.getId());
+
+            permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
+            if (t.getPublished()) {
+                permissionService.grantPermission(oid, BasePermission.READ, ROLE_EDITOR_SID, ROLE_USER_SID);
+                permissionService.grantPermission(oid, BasePermission.WRITE, ROLE_EDITOR_SID);
+            }
 
             if (hasText(t.getImageUrl())) {
                 try (final BufferedInputStream inputStream = new BufferedInputStream(new URL(t.getImageUrl()).openStream())) {

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.stereotype.Service;
 
@@ -120,6 +121,7 @@ public class UserWriter extends AbstractWriter implements Writer {
                         final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.user.User", t.getId());
 
                         permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
+                        permissionService.grantPermission(oid, BasePermission.WRITE, new PrincipalSid(externalId));
                     } catch (final Exception e) {
                         throw new IllegalStateException("Could not retrieve newly created user %s in Keycloak".formatted(t.getUid()), e);
                     }
@@ -137,6 +139,18 @@ public class UserWriter extends AbstractWriter implements Writer {
                                 WHERE id = %s""",
                         t.getSpexareId(), t.getId()))
         );
+
+        // Grant write permission to partners
+        jdbcTemplate
+                .query("SELECT u.external_id, s.id FROM user u LEFT JOIN spexare s ON s.id = u.spexare_id WHERE s.partner_id IS NOT NULL",
+                        resultSet -> {
+                            final String externalId = resultSet.getString("external_id");
+                            final Long spexareId = resultSet.getLong("id");
+
+                            final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spexare.Spexare", spexareId);
+
+                            permissionService.grantPermission(oid, BasePermission.WRITE, new PrincipalSid(externalId));
+                        });
     }
 
     private String mapGroup(final String group) {
