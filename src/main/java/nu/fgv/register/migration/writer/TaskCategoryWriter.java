@@ -28,10 +28,10 @@ public class TaskCategoryWriter extends AbstractWriter implements Writer {
         context.getTaskCategories().forEach(t -> {
             jdbcTemplate.execute(String.format("""
                             INSERT INTO task_category
-                            (id, name, has_actor, created_by, created_at, last_modified_by, last_modified_at)
+                            (id, name, actor_present, created_by, created_at, last_modified_by, last_modified_at)
                             values
                             (%s, '%s', %s, '%s', '%s', '%s', '%s')""",
-                    t.getId(), escapeSql(t.getName()), t.getHasActor(),
+                    t.getId(), escapeSql(t.getName()), t.getActorPresent(),
                     mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
 
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.task.category.TaskCategory", t.getId());

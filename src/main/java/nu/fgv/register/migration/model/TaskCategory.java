@@ -23,13 +23,13 @@ public class TaskCategory extends AbstractAuditable implements Serializable {
 
     private String name;
 
-    private Boolean hasActor;
+    private Boolean actorPresent;
 
     @Builder
     public TaskCategory(
             final Long id,
             final String name,
-            final Boolean hasActor,
+            final Boolean actorPresent,
             final String createdBy,
             final LocalDateTime createdAt,
             final String lastModifiedBy,
@@ -38,6 +38,6 @@ public class TaskCategory extends AbstractAuditable implements Serializable {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;
         this.name = name;
-        this.hasActor = hasActor;
+        this.actorPresent = actorPresent;
     }
 }

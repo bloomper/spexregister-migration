@@ -22,7 +22,7 @@ public class TaskCategoryReader extends AbstractReader implements Reader {
                             TaskCategory.builder()
                                     .id(rs.getLong("id"))
                                     .name(rs.getString("name"))
-                                    .hasActor(rs.getBoolean("has_actor"))
+                                    .actorPresent(rs.getBoolean("actor_present"))
                                     .createdBy(rs.getString("created_by"))
                                     .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                                     .lastModifiedBy(rs.getString("updated_by"))
