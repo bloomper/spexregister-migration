@@ -1,12 +1,17 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.3.5'
-	id 'io.spring.dependency-management' version '1.1.6'
+	id 'org.springframework.boot' version '3.5.9'
+	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'nu.fgv.register'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+}
 
 configurations {
 	compileOnly {
@@ -19,7 +24,7 @@ repositories {
 }
 
 ext {
-	set('springShellVersion', "3.3.3")
+	set('springShellVersion', "3.4.1")
 }
 
 dependencies {
@@ -28,14 +33,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.shell:spring-shell-starter'
 	implementation 'org.springframework.security:spring-security-acl'
-	implementation 'org.keycloak:keycloak-admin-client:26.0.3'
-	implementation 'commons-validator:commons-validator:1.9.0'
+	implementation 'org.keycloak:keycloak-admin-client:26.0.8'
+	implementation 'commons-validator:commons-validator:1.10.1'
 
 	compileOnly 'org.projectlombok:lombok'
 
 	runtimeOnly 'mysql:mysql-connector-java:5.1.49'
 	runtimeOnly 'com.mysql:mysql-connector-j'
-	runtimeOnly 'org.jruby:jruby:9.4.9.0'
+	runtimeOnly 'org.jruby:jruby:9.4.14.0'
 
 	annotationProcessor 'org.projectlombok:lombok'
 }
