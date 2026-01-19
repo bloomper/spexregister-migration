@@ -25,9 +25,9 @@ public class TagReader extends AbstractReader implements Reader {
                                     .id(rs.getLong("id"))
                                     .name(rs.getString("name"))
                                     .createdBy(rs.getString("created_by"))
-                                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                    .createdAt(rs.getTimestamp("created_at").toInstant())
                                     .lastModifiedBy(rs.getString("updated_by"))
-                                    .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                                    .lastModifiedAt(rs.getTimestamp("updated_at").toInstant())
                                     .build()
                     );
                 });

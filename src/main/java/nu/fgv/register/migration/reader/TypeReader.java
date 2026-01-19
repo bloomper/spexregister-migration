@@ -26,9 +26,9 @@ public class TypeReader extends AbstractReader implements Reader {
                                     .id(rs.getString("id"))
                                     .type(TypeType.valueOf(rs.getString("type")))
                                     .createdBy(rs.getString("created_by"))
-                                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                    .createdAt(rs.getTimestamp("created_at").toInstant())
                                     .lastModifiedBy(rs.getString("last_modified_by"))
-                                    .lastModifiedAt(rs.getTimestamp("last_modified_at") != null ? rs.getTimestamp("last_modified_at").toLocalDateTime() : null)
+                                    .lastModifiedAt(rs.getTimestamp("last_modified_at") != null ? rs.getTimestamp("last_modified_at").toInstant() : null)
                                     .build()
                     );
                 });

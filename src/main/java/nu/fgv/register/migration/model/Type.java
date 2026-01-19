@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 
 @Getter
@@ -32,9 +32,9 @@ public class Type extends AbstractAuditable implements Serializable {
             final Map<String, String> labels,
             final TypeType type,
             final String createdBy,
-            final LocalDateTime createdAt,
+            final Instant createdAt,
             final String lastModifiedBy,
-            final LocalDateTime lastModifiedAt
+            final Instant lastModifiedAt
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;

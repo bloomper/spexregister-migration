@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -15,10 +15,10 @@ public abstract class AbstractAuditable {
 
     private String createdBy;
 
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     private String lastModifiedBy;
 
-    private LocalDateTime lastModifiedAt;
+    private Instant lastModifiedAt;
 
 }

@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,9 +44,9 @@ public class User extends AbstractAuditable implements Serializable {
             final Integer spexareId,
             final String state,
             final String createdBy,
-            final LocalDateTime createdAt,
+            final Instant createdAt,
             final String lastModifiedBy,
-            final LocalDateTime lastModifiedAt
+            final Instant lastModifiedAt
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;

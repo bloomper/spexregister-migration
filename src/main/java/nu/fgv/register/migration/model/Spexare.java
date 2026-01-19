@@ -8,8 +8,8 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -88,9 +88,9 @@ public class Spexare extends AbstractAuditable implements Serializable {
             final List<Consent> consents,
             final List<Toggle> toggles,
             final String createdBy,
-            final LocalDateTime createdAt,
+            final Instant createdAt,
             final String lastModifiedBy,
-            final LocalDateTime lastModifiedAt
+            final Instant lastModifiedAt
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;

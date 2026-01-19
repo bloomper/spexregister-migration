@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -40,9 +40,9 @@ public class Spex extends AbstractAuditable implements Serializable {
             final SpexDetails details,
             final Spex parent,
             final String createdBy,
-            final LocalDateTime createdAt,
+            final Instant createdAt,
             final String lastModifiedBy,
-            final LocalDateTime lastModifiedAt
+            final Instant lastModifiedAt
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;

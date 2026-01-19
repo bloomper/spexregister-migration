@@ -51,15 +51,15 @@ public class SpexReader extends AbstractReader implements Reader {
                                                     .orElse(null)
                                             )
                                             .createdBy(rs.getString("spexDetailsCreatedBy"))
-                                            .createdAt(rs.getTimestamp("spexDetailsCreatedAt").toLocalDateTime())
+                                            .createdAt(rs.getTimestamp("spexDetailsCreatedAt").toInstant())
                                             .lastModifiedBy(rs.getString("spexDetailsUpdatedBy"))
-                                            .lastModifiedAt(rs.getTimestamp("spexDetailsUpdatedAt").toLocalDateTime())
+                                            .lastModifiedAt(rs.getTimestamp("spexDetailsUpdatedAt").toInstant())
                                             .build()
                                     )
                                     .createdBy(rs.getString("spexCreatedBy"))
-                                    .createdAt(rs.getTimestamp("spexCreatedAt").toLocalDateTime())
+                                    .createdAt(rs.getTimestamp("spexCreatedAt").toInstant())
                                     .lastModifiedBy(rs.getString("spexUpdatedBy"))
-                                    .lastModifiedAt(rs.getTimestamp("spexUpdatedAt").toLocalDateTime())
+                                    .lastModifiedAt(rs.getTimestamp("spexUpdatedAt").toInstant())
                                     .build()
                     );
                 });
@@ -89,9 +89,9 @@ public class SpexReader extends AbstractReader implements Reader {
                                                     .parent(parent)
                                                     .details(parent.getDetails())
                                                     .createdBy(rs.getString("created_by"))
-                                                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                                    .createdAt(rs.getTimestamp("created_at").toInstant())
                                                     .lastModifiedBy(rs.getString("updated_by"))
-                                                    .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                                                    .lastModifiedAt(rs.getTimestamp("updated_at").toInstant())
                                                     .build()
                                     );
                                 } catch (SQLException e) {

@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -28,9 +28,9 @@ public class Tag extends AbstractAuditable implements Serializable {
             final Long id,
             final String name,
             final String createdBy,
-            final LocalDateTime createdAt,
+            final Instant createdAt,
             final String lastModifiedBy,
-            final LocalDateTime lastModifiedAt
+            final Instant lastModifiedAt
     ) {
         super(createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.id = id;

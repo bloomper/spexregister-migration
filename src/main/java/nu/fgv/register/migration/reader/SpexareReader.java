@@ -72,9 +72,9 @@ public class SpexareReader extends AbstractReader implements Reader {
                                     .activities(new ArrayList<>())
                                     .taggings(new ArrayList<>())
                                     .createdBy(rs.getString("created_by"))
-                                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                    .createdAt(rs.getTimestamp("created_at").toInstant())
                                     .lastModifiedBy(rs.getString("updated_by"))
-                                    .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                                    .lastModifiedAt(rs.getTimestamp("updated_at").toInstant())
                                     .build()
                     );
                 });
@@ -213,9 +213,9 @@ public class SpexareReader extends AbstractReader implements Reader {
                                             }).findFirst().orElseThrow(() -> new RuntimeException("Could not find type FGV/CING")))
                                             .spexare(s)
                                             .createdBy(rs.getString("created_by"))
-                                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                            .createdAt(rs.getTimestamp("created_at").toInstant())
                                             .lastModifiedBy(rs.getString("updated_by"))
-                                            .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                                            .lastModifiedAt(rs.getTimestamp("updated_at").toInstant())
                                             .build()
                             );
                         }
@@ -242,9 +242,9 @@ public class SpexareReader extends AbstractReader implements Reader {
                                             }).findFirst().orElseThrow(() -> new RuntimeException("Could not find tag")))
                                             .spexare(s)
                                             .createdBy(rs.getString("created_by"))
-                                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                            .createdAt(rs.getTimestamp("created_at").toInstant())
                                             .lastModifiedBy(rs.getString("updated_by"))
-                                            .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                                            .lastModifiedAt(rs.getTimestamp("updated_at").toInstant())
                                             .build()
                             );
                         }
@@ -283,9 +283,9 @@ public class SpexareReader extends AbstractReader implements Reader {
                                         .spexare(s)
                                         .taskActivities(new ArrayList<>())
                                         .createdBy(rs.getString("created_by"))
-                                        .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                        .createdAt(rs.getTimestamp("created_at").toInstant())
                                         .lastModifiedBy(rs.getString("updated_by"))
-                                        .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                                        .lastModifiedAt(rs.getTimestamp("updated_at").toInstant())
                                         .build()
                         );
                     }
@@ -311,9 +311,9 @@ public class SpexareReader extends AbstractReader implements Reader {
                                             }).findFirst().orElseThrow(() -> new RuntimeException("Could not find spex")))
                                             .activity(a)
                                             .createdBy(rs.getString("created_by"))
-                                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                            .createdAt(rs.getTimestamp("created_at").toInstant())
                                             .lastModifiedBy(rs.getString("updated_by"))
-                                            .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                                            .lastModifiedAt(rs.getTimestamp("updated_at").toInstant())
                                             .build()
                             );
                         }
@@ -339,9 +339,9 @@ public class SpexareReader extends AbstractReader implements Reader {
                                             .activity(a)
                                             .actors(new ArrayList<>())
                                             .createdBy(rs.getString("created_by"))
-                                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                                            .createdAt(rs.getTimestamp("created_at").toInstant())
                                             .lastModifiedBy(rs.getString("updated_by"))
-                                            .lastModifiedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                                            .lastModifiedAt(rs.getTimestamp("updated_at").toInstant())
                                             .build()
                             );
                         }
@@ -374,9 +374,9 @@ public class SpexareReader extends AbstractReader implements Reader {
                                                     .vocal(context.getTypes().stream().filter(t -> t.getId().equals(vocalId)).findFirst().orElseThrow(() -> new RuntimeException("Could not find vocal")))
                                                     .taskActivity(ta)
                                                     .createdBy(rs2.getString("created_by"))
-                                                    .createdAt(rs2.getTimestamp("created_at").toLocalDateTime())
+                                                    .createdAt(rs2.getTimestamp("created_at").toInstant())
                                                     .lastModifiedBy(rs2.getString("updated_by"))
-                                                    .lastModifiedAt(rs2.getTimestamp("updated_at").toLocalDateTime())
+                                                    .lastModifiedAt(rs2.getTimestamp("updated_at").toInstant())
                                                     .build()
                                     );
                                 }
