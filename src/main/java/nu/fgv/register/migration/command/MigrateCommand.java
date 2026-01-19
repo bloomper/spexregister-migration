@@ -2,7 +2,6 @@ package nu.fgv.register.migration.command;
 
 import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
-import nu.fgv.register.migration.reader.EventReader;
 import nu.fgv.register.migration.reader.NewsReader;
 import nu.fgv.register.migration.reader.SpexCategoryReader;
 import nu.fgv.register.migration.reader.SpexReader;
@@ -12,7 +11,7 @@ import nu.fgv.register.migration.reader.TaskCategoryReader;
 import nu.fgv.register.migration.reader.TaskReader;
 import nu.fgv.register.migration.reader.TypeReader;
 import nu.fgv.register.migration.reader.UserReader;
-import nu.fgv.register.migration.writer.EventWriter;
+import nu.fgv.register.migration.writer.GlobalWriter;
 import nu.fgv.register.migration.writer.NewsWriter;
 import nu.fgv.register.migration.writer.SpexCategoryWriter;
 import nu.fgv.register.migration.writer.SpexWriter;
@@ -37,7 +36,6 @@ public class MigrateCommand {
     private final NewsReader newsReader;
     private final SpexareReader spexareReader;
     private final UserReader userReader;
-    private final EventReader eventReader;
     private final TypeReader typeReader;
     private final SpexCategoryWriter spexCategoryWriter;
     private final SpexWriter spexWriter;
@@ -47,8 +45,7 @@ public class MigrateCommand {
     private final NewsWriter newsWriter;
     private final SpexareWriter spexareWriter;
     private final UserWriter userWriter;
-    private final EventWriter eventWriter;
-    private final EventWriter globalWriter;
+    private final GlobalWriter globalWriter;
 
     public MigrateCommand(final SpexCategoryReader spexCategoryReader,
                           final SpexReader spexReader,
@@ -58,7 +55,6 @@ public class MigrateCommand {
                           final NewsReader newsReader,
                           final SpexareReader spexareReader,
                           final UserReader userReader,
-                          final EventReader eventReader,
                           final TypeReader typeReader,
                           final SpexCategoryWriter spexCategoryWriter,
                           final SpexWriter spexWriter,
@@ -68,8 +64,7 @@ public class MigrateCommand {
                           final NewsWriter newsWriter,
                           final SpexareWriter spexareWriter,
                           final UserWriter userWriter,
-                          final EventWriter eventWriter,
-                          final EventWriter globalWriter) {
+                          final GlobalWriter globalWriter) {
         this.spexCategoryReader = spexCategoryReader;
         this.spexReader = spexReader;
         this.taskCategoryReader = taskCategoryReader;
@@ -78,7 +73,6 @@ public class MigrateCommand {
         this.newsReader = newsReader;
         this.spexareReader = spexareReader;
         this.userReader = userReader;
-        this.eventReader = eventReader;
         this.typeReader = typeReader;
         this.spexCategoryWriter = spexCategoryWriter;
         this.spexWriter = spexWriter;
@@ -88,7 +82,6 @@ public class MigrateCommand {
         this.newsWriter = newsWriter;
         this.spexareWriter = spexareWriter;
         this.userWriter = userWriter;
-        this.eventWriter = eventWriter;
         this.globalWriter = globalWriter;
     }
 
@@ -117,8 +110,6 @@ public class MigrateCommand {
         spexareReader.read(context);
         log.info("Reading users");
         userReader.read(context);
-        log.info("Reading events");
-        eventReader.read(context);
         log.info("Done reading from source database");
 
         log.info("Spex categories: {}", context.getSpexCategories().size());
@@ -129,15 +120,12 @@ public class MigrateCommand {
         log.info("News           : {}", context.getNews().size());
         log.info("Spexare        : {}", context.getSpexare().size());
         log.info("Users          : {}", context.getUsers().size());
-        log.info("Events         : {}", context.getEvents().size());
         log.info("Types          : {}", context.getTypes().size());
 
         if (!dryRun) {
             log.info("Starting to cleaning target database");
             log.info("Cleaning global");
             globalWriter.clean();
-            log.info("Cleaning events");
-            eventWriter.clean();
             log.info("Cleaning users");
             userWriter.clean();
             log.info("Cleaning spexare");
@@ -173,8 +161,6 @@ public class MigrateCommand {
             spexareWriter.write(context);
             log.info("Writing users");
             userWriter.write(context);
-            log.info("Writing events");
-            eventWriter.write(context);
             log.info("Done writing to target database");
         }
     }
