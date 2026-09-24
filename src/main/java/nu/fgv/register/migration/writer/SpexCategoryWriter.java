@@ -36,24 +36,23 @@ public class SpexCategoryWriter extends AbstractWriter implements Writer {
         context.getSpexCategories().forEach(t -> {
             jdbcTemplate.execute(String.format("""
                             INSERT INTO spex_category
-                            (id, name, first_year, logo_content_type, created_by, created_at, last_modified_by, last_modified_at)
+                            (id, name, first_year, created_by, created_at, last_modified_by, last_modified_at)
                             values
-                            (%s, '%s', '%s', %s, '%s', '%s', '%s', '%s')""",
+                            (%s, '%s', '%s', '%s', '%s', '%s', '%s')""",
                     t.getId(), escapeSql(t.getName()), t.getFirstYear(),
-                    hasText(t.getLogoContentType()) ? quote(t.getLogoContentType()) : null,
                     mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
 
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spex.category.SpexCategory", t.getId());
 
             permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
-            permissionService.grantPermission(oid, BasePermission.READ, ROLE_EDITOR_SID, ROLE_USER_SID);
-            permissionService.grantPermission(oid, BasePermission.WRITE, ROLE_ADMIN_SID);
+            permissionService.grantPermission(oid, BasePermission.READ, ROLE_ADMIN_SID, ROLE_EDITOR_SID, ROLE_USER_SID);
 
             if (hasText(t.getLogoUrl())) {
                 try (final BufferedInputStream inputStream = new BufferedInputStream(new URL(t.getLogoUrl()).openStream())) {
                     jdbcTemplate.update(connection -> {
-                        PreparedStatement preparedStatement = connection.prepareStatement(String.format("UPDATE spex_category SET logo = ? WHERE id = %s", t.getId()));
+                        PreparedStatement preparedStatement = connection.prepareStatement(String.format("UPDATE spex_category SET logo = ?, logo_content_type = ? WHERE id = %s", t.getId()));
                         preparedStatement.setBlob(1, inputStream);
+                        preparedStatement.setString(2, t.getLogoContentType());
                         return preparedStatement;
                     });
                 } catch (Exception e) {

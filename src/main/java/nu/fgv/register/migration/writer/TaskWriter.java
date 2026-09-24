@@ -37,7 +37,7 @@ public class TaskWriter extends AbstractWriter implements Writer {
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.task.Task", t.getId());
 
             permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
-            permissionService.grantPermission(oid, BasePermission.READ, ROLE_EDITOR_SID, ROLE_USER_SID);
+            permissionService.grantPermission(oid, BasePermission.READ, ROLE_ADMIN_SID, ROLE_EDITOR_SID, ROLE_USER_SID);
             permissionService.grantPermission(oid, BasePermission.WRITE, ROLE_EDITOR_SID);
         });
     }

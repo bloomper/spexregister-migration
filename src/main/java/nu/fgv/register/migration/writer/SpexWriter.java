@@ -38,19 +38,19 @@ public class SpexWriter extends AbstractWriter implements Writer {
         context.getSpex().stream().filter(s -> !s.isRevival()).forEach(t -> {
             jdbcTemplate.execute(String.format("""
                             INSERT INTO spex_details
-                            (id, title, poster_content_type, category_id, created_by, created_at, last_modified_by, last_modified_at)
+                            (id, title, category_id, created_by, created_at, last_modified_by, last_modified_at)
                             values
-                            (%s, '%s', %s, %s, '%s', '%s', '%s', '%s')""",
+                            (%s, '%s', %s, '%s', '%s', '%s', '%s')""",
                     t.getDetails().getId(), escapeSql(t.getDetails().getTitle()),
-                    hasText(t.getDetails().getPosterContentType()) ? quote(t.getDetails().getPosterContentType()) : null,
                     t.getDetails().getCategory().getId(),
                     mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
 
             if (hasText(t.getDetails().getPosterUrl())) {
                 try (final BufferedInputStream inputStream = new BufferedInputStream(new URL(t.getDetails().getPosterUrl()).openStream())) {
                     jdbcTemplate.update(connection -> {
-                        PreparedStatement preparedStatement = connection.prepareStatement(String.format("UPDATE spex_details SET poster = ? WHERE id = %s", t.getDetails().getId()));
+                        PreparedStatement preparedStatement = connection.prepareStatement(String.format("UPDATE spex_details SET poster = ?, poster_content_type = ? WHERE id = %s", t.getDetails().getId()));
                         preparedStatement.setBlob(1, inputStream);
+                        preparedStatement.setString(2, t.getDetails().getPosterContentType());
                         return preparedStatement;
                     });
                 } catch (Exception e) {
@@ -69,7 +69,7 @@ public class SpexWriter extends AbstractWriter implements Writer {
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spex.Spex", t.getId());
 
             permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
-            permissionService.grantPermission(oid, BasePermission.READ, ROLE_EDITOR_SID, ROLE_USER_SID);
+            permissionService.grantPermission(oid, BasePermission.READ, ROLE_ADMIN_SID, ROLE_EDITOR_SID, ROLE_USER_SID);
             permissionService.grantPermission(oid, BasePermission.WRITE, ROLE_EDITOR_SID);
         });
 
@@ -86,7 +86,7 @@ public class SpexWriter extends AbstractWriter implements Writer {
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spex.Spex", t.getId());
 
             permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
-            permissionService.grantPermission(oid, BasePermission.READ, ROLE_EDITOR_SID, ROLE_USER_SID);
+            permissionService.grantPermission(oid, BasePermission.READ, ROLE_ADMIN_SID, ROLE_EDITOR_SID, ROLE_USER_SID);
             permissionService.grantPermission(oid, BasePermission.WRITE, ROLE_EDITOR_SID);
         });
     }

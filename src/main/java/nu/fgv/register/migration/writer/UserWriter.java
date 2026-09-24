@@ -121,7 +121,7 @@ public class UserWriter extends AbstractWriter implements Writer {
                         final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.user.User", t.getId());
 
                         permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
-                        permissionService.grantPermission(oid, BasePermission.WRITE, new PrincipalSid(externalId));
+                        permissionService.grantPermission(oid, BasePermission.READ, ROLE_ADMIN_SID, new PrincipalSid(externalId));
                     } catch (final Exception e) {
                         throw new IllegalStateException("Could not retrieve newly created user %s in Keycloak".formatted(t.getUid()), e);
                     }
@@ -140,17 +140,25 @@ public class UserWriter extends AbstractWriter implements Writer {
                         t.getSpexareId(), t.getId()))
         );
 
-        // Grant write permission to partners
+        // A linked user may read and edit their own record and their partner's, as spexregister-server grants
         jdbcTemplate
-                .query("SELECT u.external_id, s.id FROM user u LEFT JOIN spexare s ON s.id = u.spexare_id WHERE s.partner_id IS NOT NULL",
+                .query("SELECT u.external_id, s.id, s.partner_id FROM user u JOIN spexare s ON s.id = u.spexare_id",
                         resultSet -> {
-                            final String externalId = resultSet.getString("external_id");
-                            final Long spexareId = resultSet.getLong("id");
+                            final PrincipalSid sid = new PrincipalSid(resultSet.getString("external_id"));
+                            final long spexareId = resultSet.getLong("id");
+                            final long partnerId = resultSet.getLong("partner_id");
+                            final boolean hasPartner = !resultSet.wasNull();
 
-                            final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spexare.Spexare", spexareId);
-
-                            permissionService.grantPermission(oid, BasePermission.WRITE, new PrincipalSid(externalId));
+                            grantReadAndWrite(toObjectIdentity("nu.fgv.register.server.spexare.Spexare", spexareId), sid);
+                            if (hasPartner) {
+                                grantReadAndWrite(toObjectIdentity("nu.fgv.register.server.spexare.Spexare", partnerId), sid);
+                            }
                         });
+    }
+
+    private void grantReadAndWrite(final ObjectIdentity oid, final PrincipalSid sid) {
+        permissionService.grantPermission(oid, BasePermission.READ, sid);
+        permissionService.grantPermission(oid, BasePermission.WRITE, sid);
     }
 
     private String mapGroup(final String group) {
