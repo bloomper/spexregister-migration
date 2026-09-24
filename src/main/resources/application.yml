@@ -17,8 +17,6 @@ spring:
 spexregister:
   crypto:
     secret-key: ${SECRET_KEY}
-    initialization-vector: ${IV}
-    algorithm: "AES/CFB/PKCS5Padding"
   keycloak:
     url: ${KEYCLOAK_URL}
     realm: ${KEYCLOAK_REALM}

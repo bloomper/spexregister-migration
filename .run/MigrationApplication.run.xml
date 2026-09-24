@@ -9,11 +9,6 @@
       </param>
       <param>
         <option name="enabled" value="true" />
-        <option name="name" value="IV" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
         <option name="name" value="KEYCLOAK_URL" />
         <option name="value" value="TODO" />
       </param>
@@ -68,7 +63,7 @@
         <option name="value" value="TODO" />
       </param>
     </additionalParameters>
-    <module name="nu.fgv.register.spexregister-migration.main" />
+    <module name="spexregister-migration.main" />
     <selectedOptions>
       <option name="environmentVariables" />
     </selectedOptions>
