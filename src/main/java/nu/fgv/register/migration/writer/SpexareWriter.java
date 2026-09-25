@@ -11,9 +11,6 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedInputStream;
-import java.net.URL;
-import java.sql.PreparedStatement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -73,13 +70,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
             }
 
             if (hasText(t.getImageUrl())) {
-                try (final BufferedInputStream inputStream = new BufferedInputStream(new URL(t.getImageUrl()).openStream())) {
-                    jdbcTemplate.update(connection -> {
-                        PreparedStatement preparedStatement = connection.prepareStatement(String.format("UPDATE spexare SET image = ?, image_content_type = ? WHERE id = %s", t.getId()));
-                        preparedStatement.setBlob(1, inputStream);
-                        preparedStatement.setString(2, t.getImageContentType());
-                        return preparedStatement;
-                    });
+                try {
+                    writeImage(t.getImageUrl(), t.getImageContentType(), "spexare", "image_id", t.getId());
                 } catch (Exception e) {
                     log.error("Unexpected error when writing image for spexare", e);
                 }

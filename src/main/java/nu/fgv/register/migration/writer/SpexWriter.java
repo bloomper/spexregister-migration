@@ -10,9 +10,6 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedInputStream;
-import java.net.URL;
-import java.sql.PreparedStatement;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -46,13 +43,8 @@ public class SpexWriter extends AbstractWriter implements Writer {
                     mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
 
             if (hasText(t.getDetails().getPosterUrl())) {
-                try (final BufferedInputStream inputStream = new BufferedInputStream(new URL(t.getDetails().getPosterUrl()).openStream())) {
-                    jdbcTemplate.update(connection -> {
-                        PreparedStatement preparedStatement = connection.prepareStatement(String.format("UPDATE spex_details SET poster = ?, poster_content_type = ? WHERE id = %s", t.getDetails().getId()));
-                        preparedStatement.setBlob(1, inputStream);
-                        preparedStatement.setString(2, t.getDetails().getPosterContentType());
-                        return preparedStatement;
-                    });
+                try {
+                    writeImage(t.getDetails().getPosterUrl(), t.getDetails().getPosterContentType(), "spex_details", "poster_id", t.getDetails().getId());
                 } catch (Exception e) {
                     log.error("Unexpected error when writing poster for spex", e);
                 }

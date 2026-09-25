@@ -3,11 +3,19 @@ package nu.fgv.register.migration.writer;
 import nu.fgv.register.migration.model.User;
 import nu.fgv.register.migration.util.PermissionService;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.model.ObjectIdentity;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URI;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -57,5 +65,21 @@ public class AbstractWriter {
 
     static ObjectIdentity toObjectIdentity(final String clazz, final Serializable id) {
         return new ObjectIdentityImpl(clazz, id);
+    }
+
+    void writeImage(final String url, final String contentType, final String ownerTable, final String ownerColumn, final Long ownerId) throws IOException {
+        try (final InputStream inputStream = new BufferedInputStream(URI.create(url).toURL().openStream())) {
+            final KeyHolder keyHolder = new GeneratedKeyHolder();
+
+            jdbcTemplate.update(connection -> {
+                final PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO image (data, content_type) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
+
+                preparedStatement.setBlob(1, inputStream);
+                preparedStatement.setString(2, contentType != null ? contentType : "application/octet-stream");
+                return preparedStatement;
+            }, keyHolder);
+
+            jdbcTemplate.update("UPDATE %s SET %s = ? WHERE id = ?".formatted(ownerTable, ownerColumn), Objects.requireNonNull(keyHolder.getKey()).longValue(), ownerId);
+        }
     }
 }

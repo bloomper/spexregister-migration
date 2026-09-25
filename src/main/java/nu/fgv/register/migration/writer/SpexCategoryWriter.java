@@ -9,9 +9,6 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedInputStream;
-import java.net.URL;
-import java.sql.PreparedStatement;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -48,13 +45,8 @@ public class SpexCategoryWriter extends AbstractWriter implements Writer {
             permissionService.grantPermission(oid, BasePermission.READ, ROLE_ADMIN_SID, ROLE_EDITOR_SID, ROLE_USER_SID);
 
             if (hasText(t.getLogoUrl())) {
-                try (final BufferedInputStream inputStream = new BufferedInputStream(new URL(t.getLogoUrl()).openStream())) {
-                    jdbcTemplate.update(connection -> {
-                        PreparedStatement preparedStatement = connection.prepareStatement(String.format("UPDATE spex_category SET logo = ?, logo_content_type = ? WHERE id = %s", t.getId()));
-                        preparedStatement.setBlob(1, inputStream);
-                        preparedStatement.setString(2, t.getLogoContentType());
-                        return preparedStatement;
-                    });
+                try {
+                    writeImage(t.getLogoUrl(), t.getLogoContentType(), "spex_category", "logo_id", t.getId());
                 } catch (Exception e) {
                     log.error("Unexpected error when writing logo for spex category", e);
                 }

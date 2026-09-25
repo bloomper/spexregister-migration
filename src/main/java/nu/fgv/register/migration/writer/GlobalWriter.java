@@ -23,6 +23,7 @@ public class GlobalWriter extends AbstractWriter implements Writer {
         jdbcTemplate.execute("TRUNCATE TABLE acl_object_identity");
         jdbcTemplate.execute("TRUNCATE TABLE acl_class");
         jdbcTemplate.execute("TRUNCATE TABLE acl_sid");
+        jdbcTemplate.execute("TRUNCATE TABLE image");
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 
