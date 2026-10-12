@@ -32,7 +32,7 @@ public class TagWriter extends AbstractWriter implements Writer {
                             values
                             (%s, '%s', '%s', '%s', '%s', '%s')""",
                     t.getId(), escapeSql(t.getName()),
-                    mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+                    mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.tag.Tag", t.getId());
 

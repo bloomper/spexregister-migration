@@ -34,6 +34,8 @@ public class UserWriter extends AbstractWriter implements Writer {
     private final String keycloakClientId;
     @Value("${spexregister.keycloak.realm}")
     private String keycloakRealm;
+    @Value("${spexregister.keycloak.pending-approval-group}")
+    private String pendingApprovalGroup;
 
     protected UserWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate,
                          final PermissionService permissionService,
@@ -46,6 +48,18 @@ public class UserWriter extends AbstractWriter implements Writer {
 
     @Override
     public void clean() {
+        jdbcTemplate.queryForList("SELECT external_id FROM user", String.class).forEach(externalId -> {
+            try (final Response response = keycloakAdminClient
+                    .realm(keycloakRealm)
+                    .users()
+                    .delete(externalId)
+            ) {
+                if (response.getStatus() != HttpStatus.NO_CONTENT.value() && response.getStatus() != HttpStatus.NOT_FOUND.value()) {
+                    throw new IllegalStateException("Could not delete user %s in Keycloak".formatted(externalId));
+                }
+            }
+        });
+
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
         jdbcTemplate.execute("TRUNCATE TABLE user");
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
@@ -58,17 +72,23 @@ public class UserWriter extends AbstractWriter implements Writer {
                 "USER", getRoleRepresentationById("USER")
         );
         final ObjectMapper objectMapper = new ObjectMapper();
+        final String pendingApprovalGroupId = keycloakAdminClient
+                .realm(keycloakRealm)
+                .getGroupByPath("/" + pendingApprovalGroup)
+                .getId();
 
         context.getUsers().forEach(t -> {
             final UserRepresentation userRepresentation = new UserRepresentation();
             final CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+            final String state = mapState(t.getState());
+            final boolean pending = "pending".equals(t.getState());
 
             if (EmailValidator.getInstance().isValid(t.getUid())) {
                 userRepresentation.setEmail(t.getUid());
             } else {
                 userRepresentation.setUsername(t.getUid());
             }
-            userRepresentation.setEnabled(true);
+            userRepresentation.setEnabled(pending || "ACTIVE".equals(state));
 
             try {
                 credentialRepresentation.setCredentialData(objectMapper.writeValueAsString(Map.of(
@@ -100,29 +120,35 @@ public class UserWriter extends AbstractWriter implements Writer {
                                 .realm(keycloakRealm)
                                 .users()
                                 .get(externalId);
-                        final List<RoleRepresentation> authorities = t.getGroups().stream()
-                                .map(this::mapGroup)
-                                .map(roleRepresentations::get)
-                                .toList();
 
-                        userResource
-                                .roles()
-                                .clientLevel(keycloakClientId)
-                                .add(authorities);
+                        if (pending) {
+                            userResource.joinGroup(pendingApprovalGroupId);
+                        } else {
+                            final List<RoleRepresentation> authorities = t.getGroups().stream()
+                                    .map(this::mapGroup)
+                                    .map(roleRepresentations::get)
+                                    .toList();
+
+                            userResource
+                                    .roles()
+                                    .clientLevel(keycloakClientId)
+                                    .add(authorities);
+                        }
 
                         jdbcTemplate.execute(String.format("""
                                         INSERT INTO user
-                                        (id, external_id, state, created_by, created_at, last_modified_by, last_modified_at)
+                                        (id, external_id, state_id, created_by, created_at, last_modified_by, last_modified_at)
                                         values
                                         (%s, '%s', '%s', '%s', '%s', '%s', '%s')""",
-                                t.getId(), externalId, mapState(t.getState()),
-                                mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+                                t.getId(), externalId, state,
+                                mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 
                         final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.user.User", t.getId());
 
                         permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
                         permissionService.grantPermission(oid, BasePermission.READ, ROLE_ADMIN_SID, new PrincipalSid(externalId));
                     } catch (final Exception e) {
+                        keycloakAdminClient.realm(keycloakRealm).users().delete(externalId).close();
                         throw new IllegalStateException("Could not retrieve newly created user %s in Keycloak".formatted(t.getUid()), e);
                     }
                 } else {
@@ -140,7 +166,6 @@ public class UserWriter extends AbstractWriter implements Writer {
                         t.getSpexareId(), t.getId()))
         );
 
-        // A linked user may read and edit their own record and their partner's, as spexregister-server grants
         jdbcTemplate
                 .query("SELECT u.external_id, s.id, s.partner_id FROM user u JOIN spexare s ON s.id = u.spexare_id",
                         resultSet -> {
@@ -178,11 +203,8 @@ public class UserWriter extends AbstractWriter implements Writer {
             case "active" -> {
                 return "ACTIVE";
             }
-            case "inactive" -> {
+            case "inactive", "pending" -> {
                 return "INACTIVE";
-            }
-            case "pending" -> {
-                return "PENDING";
             }
             default -> throw new IllegalArgumentException("Unknown state");
         }

@@ -40,7 +40,7 @@ public class SpexWriter extends AbstractWriter implements Writer {
                             (%s, '%s', %s, '%s', '%s', '%s', '%s')""",
                     t.getDetails().getId(), escapeSql(t.getDetails().getTitle()),
                     t.getDetails().getCategory().getId(),
-                    mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+                    mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 
             if (hasText(t.getDetails().getPosterUrl())) {
                 try {
@@ -56,7 +56,7 @@ public class SpexWriter extends AbstractWriter implements Writer {
                             values
                             (%s, '%s', %s, '%s', '%s', '%s', '%s')""",
                     t.getId(), t.getYear(), t.getDetails().getId(),
-                    mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+                    mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spex.Spex", t.getId());
 
@@ -73,7 +73,7 @@ public class SpexWriter extends AbstractWriter implements Writer {
                                 values
                                 (%s, '%s', %s, %s, '%s', '%s', '%s', '%s')""",
                         t.getId(), t.getYear(), t.getDetails().getId(), t.getParent().getId(),
-                        mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+                        mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spex.Spex", t.getId());
 

@@ -16,7 +16,9 @@ import java.io.Serializable;
 import java.net.URI;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +26,7 @@ import java.util.Objects;
 public class AbstractWriter {
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
 
     static final String ROLE_ADMIN = "ROLE_spexregister_ADMIN";
     static final String ROLE_EDITOR = "ROLE_spexregister_EDITOR";
@@ -61,6 +64,10 @@ public class AbstractWriter {
 
     static String quote(final LocalDate date) {
         return quote(date.format(DATE_FORMAT));
+    }
+
+    static String formatTimestamp(final Instant instant) {
+        return TIMESTAMP_FORMAT.format(instant);
     }
 
     static ObjectIdentity toObjectIdentity(final String clazz, final Serializable id) {

@@ -32,7 +32,7 @@ public class TaskCategoryWriter extends AbstractWriter implements Writer {
                             values
                             (%s, '%s', %s, '%s', '%s', '%s', '%s')""",
                     t.getId(), escapeSql(t.getName()), t.getActorPresent(),
-                    mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+                    mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.task.category.TaskCategory", t.getId());
 

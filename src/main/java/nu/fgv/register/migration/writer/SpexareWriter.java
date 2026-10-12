@@ -58,7 +58,7 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                     hasText(t.getNickName()) ? quote(escapeSql(t.getNickName())) : null, constructSocialSecurityNumber(t.getBirthDate(), t.getSocialSecurityNumber()),
                     t.getDeceased(), t.getPublished(),
                     hasText(t.getGraduation()) ? quote(t.getGraduation()) : null, hasText(t.getComment()) ? quote(escapeSql(t.getComment())) : null,
-                    mapUser(context.getUsers(), t.getCreatedBy()), t.getCreatedAt(), mapUser(context.getUsers(), t.getLastModifiedBy()), t.getLastModifiedAt()));
+                    mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spexare.Spexare", t.getId());
 
@@ -85,7 +85,7 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                                      created_by, created_at, last_modified_by, last_modified_at) values
                                     (%s, '%s', '%s', %s, '%s', '%s', '%s', '%s')""",
                             m.getId(), m.getYear(), m.getType().getId(), t.getId(),
-                            mapUser(context.getUsers(), m.getCreatedBy()), m.getCreatedAt(), mapUser(context.getUsers(), m.getLastModifiedBy()), m.getLastModifiedAt()))
+                            mapUser(context.getUsers(), m.getCreatedBy()), formatTimestamp(m.getCreatedAt()), mapUser(context.getUsers(), m.getLastModifiedBy()), formatTimestamp(m.getLastModifiedAt())))
             );
 
             // Address
@@ -99,7 +99,7 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                             hasText(a.getCity()) ? quote(escapeSql(a.getCity())) : null, hasText(a.getCountry()) ? quote(escapeSql(a.getCountry())) : null,
                             hasText(a.getPhone()) ? quote(escapeSql(a.getPhone())) : null, hasText(a.getPhoneMobile()) ? quote(escapeSql(a.getPhoneMobile())) : null,
                             hasText(a.getEmailAddress()) ? quote(escapeSql(a.getEmailAddress())) : null, a.getType().getId(), t.getId(),
-                            mapUser(context.getUsers(), a.getCreatedBy()), a.getCreatedAt(), mapUser(context.getUsers(), a.getLastModifiedBy()), a.getLastModifiedAt()))
+                            mapUser(context.getUsers(), a.getCreatedBy()), formatTimestamp(a.getCreatedAt()), mapUser(context.getUsers(), a.getLastModifiedBy()), formatTimestamp(a.getLastModifiedAt())))
             );
 
             // Consent
@@ -110,7 +110,7 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                                      created_by, created_at, last_modified_by, last_modified_at) values
                                     (%s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
                             c.getId(), c.getValue(), c.getType().getId(), t.getId(),
-                            mapUser(context.getUsers(), c.getCreatedBy()), c.getCreatedAt(), mapUser(context.getUsers(), c.getLastModifiedBy()), c.getLastModifiedAt()))
+                            mapUser(context.getUsers(), c.getCreatedBy()), formatTimestamp(c.getCreatedAt()), mapUser(context.getUsers(), c.getLastModifiedBy()), formatTimestamp(c.getLastModifiedAt())))
             );
 
             // Toggle
@@ -121,7 +121,7 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                                      created_by, created_at, last_modified_by, last_modified_at) values
                                     (%s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
                             g.getId(), g.getValue(), g.getType().getId(), t.getId(),
-                            mapUser(context.getUsers(), g.getCreatedBy()), g.getCreatedAt(), mapUser(context.getUsers(), g.getLastModifiedBy()), g.getLastModifiedAt()))
+                            mapUser(context.getUsers(), g.getCreatedBy()), formatTimestamp(g.getCreatedAt()), mapUser(context.getUsers(), g.getLastModifiedBy()), formatTimestamp(g.getLastModifiedAt())))
             );
 
             // Tagging
@@ -141,7 +141,7 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                                  created_by, created_at, last_modified_by, last_modified_at) values
                                 (%s, %s, '%s', '%s', '%s', '%s')""",
                         a.getId(), a.getSpexare().getId(),
-                        mapUser(context.getUsers(), a.getCreatedBy()), a.getCreatedAt(), mapUser(context.getUsers(), a.getLastModifiedBy()), a.getLastModifiedAt()));
+                        mapUser(context.getUsers(), a.getCreatedBy()), formatTimestamp(a.getCreatedAt()), mapUser(context.getUsers(), a.getLastModifiedBy()), formatTimestamp(a.getLastModifiedAt())));
 
                 // Spex activity
                 if (a.getSpexActivity() != null) {
@@ -153,7 +153,7 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                                      created_by, created_at, last_modified_by, last_modified_at) values
                                     (%s, %s, %s, '%s', '%s', '%s', '%s')""",
                             sa.getId(), a.getId(), sa.getSpex().getId(),
-                            mapUser(context.getUsers(), sa.getCreatedBy()), sa.getCreatedAt(), mapUser(context.getUsers(), sa.getLastModifiedBy()), sa.getLastModifiedAt()));
+                            mapUser(context.getUsers(), sa.getCreatedBy()), formatTimestamp(sa.getCreatedAt()), mapUser(context.getUsers(), sa.getLastModifiedBy()), formatTimestamp(sa.getLastModifiedAt())));
                 }
 
                 // Task activity
@@ -164,7 +164,7 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                                      created_by, created_at, last_modified_by, last_modified_at) values
                                     (%s, %s, %s, '%s', '%s', '%s', '%s')""",
                             ta.getId(), a.getId(), ta.getTask().getId(),
-                            mapUser(context.getUsers(), ta.getCreatedBy()), ta.getCreatedAt(), mapUser(context.getUsers(), ta.getLastModifiedBy()), ta.getLastModifiedAt()));
+                            mapUser(context.getUsers(), ta.getCreatedBy()), formatTimestamp(ta.getCreatedAt()), mapUser(context.getUsers(), ta.getLastModifiedBy()), formatTimestamp(ta.getLastModifiedAt())));
 
                     // Actors
                     ta.getActors().forEach(ac ->
@@ -174,7 +174,7 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                                              created_by, created_at, last_modified_by, last_modified_at) values
                                             (%s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
                                     ac.getId(), hasText(ac.getRole()) ? quote(escapeSql(ac.getRole())) : null, ac.getVocal().getId(), ta.getId(),
-                                    mapUser(context.getUsers(), ac.getCreatedBy()), ac.getCreatedAt(), mapUser(context.getUsers(), ac.getLastModifiedBy()), ac.getLastModifiedAt())));
+                                    mapUser(context.getUsers(), ac.getCreatedBy()), formatTimestamp(ac.getCreatedAt()), mapUser(context.getUsers(), ac.getLastModifiedBy()), formatTimestamp(ac.getLastModifiedAt()))));
                 });
             });
         });
