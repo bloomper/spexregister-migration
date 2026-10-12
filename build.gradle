@@ -33,7 +33,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.shell:spring-shell-starter'
 	implementation 'org.springframework.security:spring-security-acl'
-	implementation 'org.keycloak:keycloak-admin-client:26.0.8'
+	implementation 'org.keycloak:keycloak-admin-client:26.0.12'
 	implementation 'commons-validator:commons-validator:1.10.1'
 
 	compileOnly 'org.projectlombok:lombok'

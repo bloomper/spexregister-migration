@@ -72,7 +72,7 @@ public class UserWriter extends AbstractWriter implements Writer {
 
             try {
                 credentialRepresentation.setCredentialData(objectMapper.writeValueAsString(Map.of(
-                        "algorithm", "legacy-spexregister",
+                        "algorithm", "legacy-fgv",
                         "hashIterations", 20
                 )));
                 credentialRepresentation.setSecretData(objectMapper.writeValueAsString(Map.of(
