@@ -46,7 +46,7 @@ public class SpexCategoryWriter extends AbstractWriter implements Writer {
 
             if (hasText(t.getLogoUrl())) {
                 try {
-                    writeImage(t.getLogoUrl(), t.getLogoContentType(), "spex_category", "logo_id", t.getId());
+                    writeImage(t.getLogoUrl(), "spex_category", "logo_id", t.getId());
                 } catch (Exception e) {
                     log.error("Unexpected error when writing logo for spex category", e);
                 }

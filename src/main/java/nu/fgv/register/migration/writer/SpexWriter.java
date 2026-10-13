@@ -44,7 +44,7 @@ public class SpexWriter extends AbstractWriter implements Writer {
 
             if (hasText(t.getDetails().getPosterUrl())) {
                 try {
-                    writeImage(t.getDetails().getPosterUrl(), t.getDetails().getPosterContentType(), "spex_details", "poster_id", t.getDetails().getId());
+                    writeImage(t.getDetails().getPosterUrl(), "spex_details", "poster_id", t.getDetails().getId());
                 } catch (Exception e) {
                     log.error("Unexpected error when writing poster for spex", e);
                 }

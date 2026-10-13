@@ -36,7 +36,7 @@ public class SpexReader extends AbstractReader implements Reader {
                                     .details(SpexDetails.builder()
                                             .id(rs.getLong("spexDetailsId"))
                                             .title(rs.getString("spexDetailsTitle"))
-                                            .posterUrl(hasText(rs.getString("spexDetailsPosterFileName")) ? String.format("https://register.fgv.nu/system/posters/%s/original/%s", rs.getLong("spexDetailsId"), rs.getString("spexDetailsPosterFileName")) : null)
+                                            .posterUrl(hasText(rs.getString("spexDetailsPosterFileName")) ? String.format("https://register.fgv.nu/system/posters/%s/original/%s", rs.getLong("spexDetailsId"), encodeUrl(rs.getString("spexDetailsPosterFileName"))) : null)
                                             .posterContentType(rs.getString("spexDetailsPosterContentType"))
                                             .category(context.getSpexCategories().stream()
                                                     .filter(c -> {

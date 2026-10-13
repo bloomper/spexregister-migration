@@ -14,7 +14,7 @@ public class AbstractReader {
     }
 
     static String encodeUrl(final String url) {
-        return URLEncoder.encode(url, StandardCharsets.UTF_8);
+        return URLEncoder.encode(url, StandardCharsets.UTF_8).replace("+", "%20");
     }
 
 }

@@ -25,7 +25,7 @@ public class SpexCategoryReader extends AbstractReader implements Reader {
                                     .id(rs.getLong("id"))
                                     .name(rs.getString("name"))
                                     .firstYear(rs.getString("first_year"))
-                                    .logoUrl(hasText(rs.getString("logo_file_name")) ? String.format("https://register.fgv.nu/system/logos/%s/original/%s", rs.getLong("id"), rs.getString("logo_file_name")) : null)
+                                    .logoUrl(hasText(rs.getString("logo_file_name")) ? String.format("https://register.fgv.nu/system/logos/%s/original/%s", rs.getLong("id"), encodeUrl(rs.getString("logo_file_name"))) : null)
                                     .logoContentType(rs.getString("logo_content_type"))
                                     .createdBy(rs.getString("created_by"))
                                     .createdAt(rs.getTimestamp("created_at").toInstant())

@@ -71,7 +71,7 @@ public class SpexareWriter extends AbstractWriter implements Writer {
 
             if (hasText(t.getImageUrl())) {
                 try {
-                    writeImage(t.getImageUrl(), t.getImageContentType(), "spexare", "image_id", t.getId());
+                    writeImage(t.getImageUrl(), "spexare", "image_id", t.getId());
                 } catch (Exception e) {
                     log.error("Unexpected error when writing image for spexare", e);
                 }
