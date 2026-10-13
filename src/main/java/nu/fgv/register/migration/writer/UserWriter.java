@@ -137,9 +137,9 @@ public class UserWriter extends AbstractWriter implements Writer {
 
                         jdbcTemplate.execute(String.format("""
                                         INSERT INTO user
-                                        (id, external_id, state_id, created_by, created_at, last_modified_by, last_modified_at)
+                                        (id, external_id, state_id, created_by, created_at, last_modified_by, last_modified_at, version)
                                         values
-                                        (%s, '%s', '%s', '%s', '%s', '%s', '%s')""",
+                                        (%s, '%s', '%s', '%s', '%s', '%s', '%s', 0)""",
                                 t.getId(), externalId, state,
                                 mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 

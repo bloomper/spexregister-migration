@@ -28,9 +28,9 @@ public class TagWriter extends AbstractWriter implements Writer {
         context.getTags().forEach(t -> {
             jdbcTemplate.execute(String.format("""
                             INSERT INTO tag
-                            (id, name, created_by, created_at, last_modified_by, last_modified_at)
+                            (id, name, created_by, created_at, last_modified_by, last_modified_at, version)
                             values
-                            (%s, '%s', '%s', '%s', '%s', '%s')""",
+                            (%s, '%s', '%s', '%s', '%s', '%s', 0)""",
                     t.getId(), escapeSql(t.getName()),
                     mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 

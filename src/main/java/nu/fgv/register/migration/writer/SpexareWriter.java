@@ -52,8 +52,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
             jdbcTemplate.execute(String.format("""
                             INSERT INTO spexare
                             (id, first_name, last_name, nick_name, social_security_number, deceased, published, graduation, comment,
-                             created_by, created_at, last_modified_by, last_modified_at) values
-                            (%s, %s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s')""",
+                             created_by, created_at, last_modified_by, last_modified_at, version) values
+                            (%s, %s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s', 0)""",
                     t.getId(), hasText(t.getFirstName()) ? quote(escapeSql(t.getFirstName())) : null, hasText(t.getLastName()) ? quote(escapeSql(t.getLastName())) : null,
                     hasText(t.getNickName()) ? quote(escapeSql(t.getNickName())) : null, constructSocialSecurityNumber(t.getBirthDate(), t.getSocialSecurityNumber()),
                     t.getDeceased(), t.getPublished(),
@@ -82,8 +82,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO membership
                                     (id, year, type_id, spexare_id,
-                                     created_by, created_at, last_modified_by, last_modified_at) values
-                                    (%s, '%s', '%s', %s, '%s', '%s', '%s', '%s')""",
+                                     created_by, created_at, last_modified_by, last_modified_at, version) values
+                                    (%s, '%s', '%s', %s, '%s', '%s', '%s', '%s', 0)""",
                             m.getId(), m.getYear(), m.getType().getId(), t.getId(),
                             mapUser(context.getUsers(), m.getCreatedBy()), formatTimestamp(m.getCreatedAt()), mapUser(context.getUsers(), m.getLastModifiedBy()), formatTimestamp(m.getLastModifiedAt())))
             );
@@ -93,8 +93,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO address
                                     (street_address, postal_code, city, country, phone, phone_mobile, email_address, type_id, spexare_id,
-                                     created_by, created_at, last_modified_by, last_modified_at) values
-                                    (%s, %s, %s, %s, %s, %s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
+                                     created_by, created_at, last_modified_by, last_modified_at, version) values
+                                    (%s, %s, %s, %s, %s, %s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
                             hasText(a.getStreetAddress()) ? quote(escapeSql(a.getStreetAddress())) : null, hasText(a.getPostalCode()) ? quote(escapeSql(a.getPostalCode())) : null,
                             hasText(a.getCity()) ? quote(escapeSql(a.getCity())) : null, hasText(a.getCountry()) ? quote(escapeSql(a.getCountry())) : null,
                             hasText(a.getPhone()) ? quote(escapeSql(a.getPhone())) : null, hasText(a.getPhoneMobile()) ? quote(escapeSql(a.getPhoneMobile())) : null,
@@ -107,8 +107,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO consent
                                     (id, value, type_id, spexare_id,
-                                     created_by, created_at, last_modified_by, last_modified_at) values
-                                    (%s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
+                                     created_by, created_at, last_modified_by, last_modified_at, version) values
+                                    (%s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
                             c.getId(), c.getValue(), c.getType().getId(), t.getId(),
                             mapUser(context.getUsers(), c.getCreatedBy()), formatTimestamp(c.getCreatedAt()), mapUser(context.getUsers(), c.getLastModifiedBy()), formatTimestamp(c.getLastModifiedAt())))
             );
@@ -118,8 +118,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO toggle
                                     (id, value, type_id, spexare_id,
-                                     created_by, created_at, last_modified_by, last_modified_at) values
-                                    (%s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
+                                     created_by, created_at, last_modified_by, last_modified_at, version) values
+                                    (%s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
                             g.getId(), g.getValue(), g.getType().getId(), t.getId(),
                             mapUser(context.getUsers(), g.getCreatedBy()), formatTimestamp(g.getCreatedAt()), mapUser(context.getUsers(), g.getLastModifiedBy()), formatTimestamp(g.getLastModifiedAt())))
             );
@@ -138,8 +138,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                 jdbcTemplate.execute(String.format("""
                                 INSERT INTO activity
                                 (id, spexare_id,
-                                 created_by, created_at, last_modified_by, last_modified_at) values
-                                (%s, %s, '%s', '%s', '%s', '%s')""",
+                                 created_by, created_at, last_modified_by, last_modified_at, version) values
+                                (%s, %s, '%s', '%s', '%s', '%s', 0)""",
                         a.getId(), a.getSpexare().getId(),
                         mapUser(context.getUsers(), a.getCreatedBy()), formatTimestamp(a.getCreatedAt()), mapUser(context.getUsers(), a.getLastModifiedBy()), formatTimestamp(a.getLastModifiedAt())));
 
@@ -150,8 +150,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO spex_activity
                                     (id, activity_id, spex_id,
-                                     created_by, created_at, last_modified_by, last_modified_at) values
-                                    (%s, %s, %s, '%s', '%s', '%s', '%s')""",
+                                     created_by, created_at, last_modified_by, last_modified_at, version) values
+                                    (%s, %s, %s, '%s', '%s', '%s', '%s', 0)""",
                             sa.getId(), a.getId(), sa.getSpex().getId(),
                             mapUser(context.getUsers(), sa.getCreatedBy()), formatTimestamp(sa.getCreatedAt()), mapUser(context.getUsers(), sa.getLastModifiedBy()), formatTimestamp(sa.getLastModifiedAt())));
                 }
@@ -161,8 +161,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO task_activity
                                     (id, activity_id, task_id,
-                                     created_by, created_at, last_modified_by, last_modified_at) values
-                                    (%s, %s, %s, '%s', '%s', '%s', '%s')""",
+                                     created_by, created_at, last_modified_by, last_modified_at, version) values
+                                    (%s, %s, %s, '%s', '%s', '%s', '%s', 0)""",
                             ta.getId(), a.getId(), ta.getTask().getId(),
                             mapUser(context.getUsers(), ta.getCreatedBy()), formatTimestamp(ta.getCreatedAt()), mapUser(context.getUsers(), ta.getLastModifiedBy()), formatTimestamp(ta.getLastModifiedAt())));
 
@@ -171,8 +171,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                             jdbcTemplate.execute(String.format("""
                                             INSERT INTO actor
                                             (id, role, vocal_id, task_activity_id,
-                                             created_by, created_at, last_modified_by, last_modified_at) values
-                                            (%s, %s, '%s', %s, '%s', '%s', '%s', '%s')""",
+                                             created_by, created_at, last_modified_by, last_modified_at, version) values
+                                            (%s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
                                     ac.getId(), hasText(ac.getRole()) ? quote(escapeSql(ac.getRole())) : null, ac.getVocal().getId(), ta.getId(),
                                     mapUser(context.getUsers(), ac.getCreatedBy()), formatTimestamp(ac.getCreatedAt()), mapUser(context.getUsers(), ac.getLastModifiedBy()), formatTimestamp(ac.getLastModifiedAt()))));
                 });

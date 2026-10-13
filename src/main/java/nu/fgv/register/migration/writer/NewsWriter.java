@@ -28,9 +28,9 @@ public class NewsWriter extends AbstractWriter implements Writer {
         context.getNews().forEach(t -> {
             jdbcTemplate.execute(String.format("""
                             INSERT INTO news
-                            (id, subject, text, visible_from, published, created_by, created_at, last_modified_by, last_modified_at)
+                            (id, subject, text, visible_from, published, created_by, created_at, last_modified_by, last_modified_at, version)
                             values
-                            (%s, '%s', '%s', '%s', 1, '%s', '%s', '%s', '%s')""",
+                            (%s, '%s', '%s', '%s', 1, '%s', '%s', '%s', '%s', 0)""",
                     t.getId(), escapeSql(t.getSubject()), escapeSql(t.getText()), t.getVisibleFrom(),
                     mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 
