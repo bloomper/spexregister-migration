@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
+import nu.fgv.register.migration.model.Spexare;
 import nu.fgv.register.migration.util.PermissionService;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.keycloak.admin.client.Keycloak;
@@ -25,6 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -76,6 +79,8 @@ public class UserWriter extends AbstractWriter implements Writer {
                 .realm(keycloakRealm)
                 .getGroupByPath("/" + pendingApprovalGroup)
                 .getId();
+        final Map<Long, Spexare> spexareById = context.getSpexare().stream()
+                .collect(Collectors.toMap(Spexare::getId, Function.identity()));
 
         context.getUsers().forEach(t -> {
             final UserRepresentation userRepresentation = new UserRepresentation();
@@ -87,6 +92,12 @@ public class UserWriter extends AbstractWriter implements Writer {
                 userRepresentation.setEmail(t.getUid());
             } else {
                 userRepresentation.setUsername(t.getUid());
+            }
+            if (t.getSpexareId() != null && spexareById.containsKey(t.getSpexareId().longValue())) {
+                final Spexare spexare = spexareById.get(t.getSpexareId().longValue());
+
+                userRepresentation.setFirstName(spexare.getFirstName());
+                userRepresentation.setLastName(spexare.getLastName());
             }
             userRepresentation.setEnabled(pending || "ACTIVE".equals(state));
 
