@@ -21,6 +21,7 @@ import static org.springframework.util.StringUtils.hasText;
 public class SpexareWriter extends AbstractWriter implements Writer {
 
     private static final DateTimeFormatter BIRTH_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final String MISSING_NAME = "Okänd";
     private final CryptoService cryptoService;
 
     protected SpexareWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate,
@@ -54,10 +55,10 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                             (id, first_name, last_name, nick_name, social_security_number, deceased, published, graduation, comment,
                              created_by, created_at, last_modified_by, last_modified_at, version) values
                             (%s, %s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s', 0)""",
-                    t.getId(), hasText(t.getFirstName()) ? quote(escapeSql(t.getFirstName())) : null, hasText(t.getLastName()) ? quote(escapeSql(t.getLastName())) : null,
+                    t.getId(), quote(escapeSql(nameOrPlaceholder(t.getId(), "first", t.getFirstName()))), quote(escapeSql(nameOrPlaceholder(t.getId(), "last", t.getLastName()))),
                     hasText(t.getNickName()) ? quote(escapeSql(t.getNickName())) : null, constructSocialSecurityNumber(t.getBirthDate(), t.getSocialSecurityNumber()),
                     t.getDeceased(), t.getPublished(),
-                    hasText(t.getGraduation()) ? quote(t.getGraduation()) : null, hasText(t.getComment()) ? quote(escapeSql(t.getComment())) : null,
+                    hasText(t.getGraduation()) ? quote(escapeSql(t.getGraduation())) : null, hasText(t.getComment()) ? quote(escapeSql(t.getComment())) : null,
                     mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
 
             final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spexare.Spexare", t.getId());
@@ -187,6 +188,15 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                                 WHERE id = %s""",
                         t.getPartner().getId(), t.getId())));
 
+    }
+
+    private static String nameOrPlaceholder(final Long id, final String part, final String name) {
+        if (hasText(name)) {
+            return name;
+        }
+
+        log.warn("Spexare {} has no {} name, using {}", id, part, MISSING_NAME);
+        return MISSING_NAME;
     }
 
     private String constructSocialSecurityNumber(final LocalDate birthDate, final String socialSecurityNumber) {

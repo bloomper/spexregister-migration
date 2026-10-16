@@ -56,13 +56,14 @@ public class AbstractWriter {
         if (str == null) {
             return null;
         }
-        return str.replaceAll("'", "''");
+        return str.replace("\\", "\\\\").replace("'", "''");
     }
 
     static String mapUser(final List<User> users, final String id) {
         return users.stream()
                 .filter(u -> Objects.equals(u.getId(), Long.valueOf(id)))
                 .map(User::getUid)
+                .map(AbstractWriter::escapeSql)
                 .findFirst()
                 .orElse("system");
     }
