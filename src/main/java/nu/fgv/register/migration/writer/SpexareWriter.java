@@ -4,11 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
 import nu.fgv.register.migration.model.SpexActivity;
 import nu.fgv.register.migration.util.CryptoService;
-import nu.fgv.register.migration.util.PermissionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,9 +22,8 @@ public class SpexareWriter extends AbstractWriter implements Writer {
     private final CryptoService cryptoService;
 
     protected SpexareWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate,
-                            final PermissionService permissionService,
                             final CryptoService cryptoService) {
-        super(jdbcTemplate, permissionService);
+        super(jdbcTemplate);
         this.cryptoService = cryptoService;
     }
 
@@ -60,15 +56,6 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                     t.getDeceased(), t.getPublished(),
                     hasText(t.getGraduation()) ? quote(escapeSql(t.getGraduation())) : null, hasText(t.getComment()) ? quote(escapeSql(t.getComment())) : null,
                     mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
-
-            final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spexare.Spexare", t.getId());
-
-            permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
-            permissionService.grantPermission(oid, BasePermission.READ, ROLE_ADMIN_SID, ROLE_EDITOR_SID);
-            permissionService.grantPermission(oid, BasePermission.WRITE, ROLE_EDITOR_SID);
-            if (t.getPublished()) {
-                permissionService.grantPermission(oid, BasePermission.READ, ROLE_USER_SID);
-            }
 
             if (hasText(t.getImageUrl())) {
                 try {

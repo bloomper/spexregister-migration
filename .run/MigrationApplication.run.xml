@@ -1,66 +1,10 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="MigrationApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <option name="ACTIVE_PROFILES" value="local" />
-    <option name="VM_PARAMETERS" value="-Djavax.net.ssl.trustStore=$PROJECT_DIR$/../spexregister-server/.docker/caddy/truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit" />
     <additionalParameters>
       <param>
         <option name="enabled" value="true" />
-        <option name="name" value="SECRET_KEY" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="KEYCLOAK_URL" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="KEYCLOAK_REALM" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="KEYCLOAK_ADMIN_CLIENT_ID" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="KEYCLOAK_ADMIN_CLIENT_SECRET" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="KEYCLOAK_CLIENT_CLIENT_ID" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="SOURCE_DATABASE_URL" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="SOURCE_DATABASE_USERNAME" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
         <option name="name" value="SOURCE_DATABASE_PASSWORD" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="TARGET_DATABASE_URL" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="TARGET_DATABASE_USERNAME" />
-        <option name="value" value="TODO" />
-      </param>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="TARGET_DATABASE_PASSWORD" />
         <option name="value" value="TODO" />
       </param>
     </additionalParameters>
@@ -69,6 +13,7 @@
       <option name="environmentVariables" />
     </selectedOptions>
     <option name="SPRING_BOOT_MAIN_CLASS" value="nu.fgv.register.migration.MigrationApplication" />
+    <option name="VM_PARAMETERS" value="-Djavax.net.ssl.trustStore=$PROJECT_DIR$/../fgv-infra-deploy/local/.docker/caddy/truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

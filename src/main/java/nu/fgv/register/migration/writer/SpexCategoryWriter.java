@@ -2,11 +2,8 @@ package nu.fgv.register.migration.writer;
 
 import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
-import nu.fgv.register.migration.util.PermissionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.stereotype.Service;
 
 
@@ -16,9 +13,8 @@ import static org.springframework.util.StringUtils.hasText;
 @Slf4j
 public class SpexCategoryWriter extends AbstractWriter implements Writer {
 
-    protected SpexCategoryWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate,
-                                 final PermissionService permissionService) {
-        super(jdbcTemplate, permissionService);
+    protected SpexCategoryWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate) {
+        super(jdbcTemplate);
     }
 
     @Override
@@ -38,11 +34,6 @@ public class SpexCategoryWriter extends AbstractWriter implements Writer {
                             (%s, '%s', '%s', '%s', '%s', '%s', '%s', 0)""",
                     t.getId(), escapeSql(t.getName()), t.getFirstYear(),
                     mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
-
-            final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.spex.category.SpexCategory", t.getId());
-
-            permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
-            permissionService.grantPermission(oid, BasePermission.READ, ROLE_ADMIN_SID, ROLE_EDITOR_SID, ROLE_USER_SID);
 
             if (hasText(t.getLogoUrl())) {
                 try {
