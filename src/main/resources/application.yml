@@ -28,3 +28,4 @@ spexregister:
     client:
       client-id: ${KEYCLOAK_CLIENT_CLIENT_ID:spexregister}
     pending-approval-group: pending-approval
+    notification-listener: fgv-admin-notification

@@ -11,6 +11,7 @@ import nu.fgv.register.migration.reader.TaskCategoryReader;
 import nu.fgv.register.migration.reader.TaskReader;
 import nu.fgv.register.migration.reader.TypeReader;
 import nu.fgv.register.migration.reader.UserReader;
+import nu.fgv.register.migration.util.NotificationSuspender;
 import nu.fgv.register.migration.writer.GlobalWriter;
 import nu.fgv.register.migration.writer.NewsWriter;
 import nu.fgv.register.migration.writer.SpexCategoryWriter;
@@ -47,6 +48,7 @@ public class MigrateCommand {
     private final SpexareWriter spexareWriter;
     private final UserWriter userWriter;
     private final GlobalWriter globalWriter;
+    private final NotificationSuspender notificationSuspender;
 
     public MigrateCommand(final SpexCategoryReader spexCategoryReader,
                           final SpexReader spexReader,
@@ -65,7 +67,8 @@ public class MigrateCommand {
                           final NewsWriter newsWriter,
                           final SpexareWriter spexareWriter,
                           final UserWriter userWriter,
-                          final GlobalWriter globalWriter) {
+                          final GlobalWriter globalWriter,
+                          final NotificationSuspender notificationSuspender) {
         this.spexCategoryReader = spexCategoryReader;
         this.spexReader = spexReader;
         this.taskCategoryReader = taskCategoryReader;
@@ -84,6 +87,7 @@ public class MigrateCommand {
         this.spexareWriter = spexareWriter;
         this.userWriter = userWriter;
         this.globalWriter = globalWriter;
+        this.notificationSuspender = notificationSuspender;
     }
 
     @ShellMethod("Migrates Spexregister 1.x -> 2.x")
@@ -91,6 +95,10 @@ public class MigrateCommand {
             @ShellOption(value = {"-d"}, defaultValue = "true") final boolean dryRun
     ) {
         final MigrationContext context = new MigrationContext();
+
+        if (!dryRun) {
+            notificationSuspender.requireRole();
+        }
 
         log.info("Starting to read from source database");
         log.info("Reading types");
@@ -124,45 +132,47 @@ public class MigrateCommand {
         log.info("Types          : {}", context.getTypes().size());
 
         if (!dryRun) {
-            log.info("Starting to cleaning target database");
-            log.info("Cleaning global");
-            globalWriter.clean();
-            log.info("Cleaning users");
-            userWriter.clean();
-            log.info("Cleaning spexare");
-            spexareWriter.clean();
-            log.info("Cleaning spex");
-            spexWriter.clean();
-            log.info("Cleaning spex categories");
-            spexCategoryWriter.clean();
-            log.info("Cleaning tasks");
-            taskWriter.clean();
-            log.info("Cleaning task categories");
-            taskCategoryWriter.clean();
-            log.info("Cleaning tags");
-            tagWriter.clean();
-            log.info("Cleaning news");
-            newsWriter.clean();
-            log.info("Done cleaning target database");
+            try (NotificationSuspender.Suspension ignored = notificationSuspender.suspend()) {
+                log.info("Starting to cleaning target database");
+                log.info("Cleaning global");
+                globalWriter.clean();
+                log.info("Cleaning users");
+                userWriter.clean();
+                log.info("Cleaning spexare");
+                spexareWriter.clean();
+                log.info("Cleaning spex");
+                spexWriter.clean();
+                log.info("Cleaning spex categories");
+                spexCategoryWriter.clean();
+                log.info("Cleaning tasks");
+                taskWriter.clean();
+                log.info("Cleaning task categories");
+                taskCategoryWriter.clean();
+                log.info("Cleaning tags");
+                tagWriter.clean();
+                log.info("Cleaning news");
+                newsWriter.clean();
+                log.info("Done cleaning target database");
 
-            log.info("Starting to write to target database");
-            log.info("Writing news");
-            newsWriter.write(context);
-            log.info("Writing tags");
-            tagWriter.write(context);
-            log.info("Writing task categories");
-            taskCategoryWriter.write(context);
-            log.info("Writing tasks");
-            taskWriter.write(context);
-            log.info("Writing spex categories");
-            spexCategoryWriter.write(context);
-            log.info("Writing spex");
-            spexWriter.write(context);
-            log.info("Writing spexare");
-            spexareWriter.write(context);
-            log.info("Writing users");
-            userWriter.write(context);
-            log.info("Done writing to target database");
+                log.info("Starting to write to target database");
+                log.info("Writing news");
+                newsWriter.write(context);
+                log.info("Writing tags");
+                tagWriter.write(context);
+                log.info("Writing task categories");
+                taskCategoryWriter.write(context);
+                log.info("Writing tasks");
+                taskWriter.write(context);
+                log.info("Writing spex categories");
+                spexCategoryWriter.write(context);
+                log.info("Writing spex");
+                spexWriter.write(context);
+                log.info("Writing spexare");
+                spexareWriter.write(context);
+                log.info("Writing users");
+                userWriter.write(context);
+                log.info("Done writing to target database");
+            }
         }
     }
 }
