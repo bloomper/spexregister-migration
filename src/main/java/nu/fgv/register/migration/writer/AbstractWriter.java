@@ -1,16 +1,11 @@
 package nu.fgv.register.migration.writer;
 
 import nu.fgv.register.migration.model.User;
-import nu.fgv.register.migration.util.PermissionService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.security.acls.domain.GrantedAuthoritySid;
-import org.springframework.security.acls.domain.ObjectIdentityImpl;
-import org.springframework.security.acls.model.ObjectIdentity;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -31,13 +26,6 @@ public class AbstractWriter {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
 
-    static final String ROLE_ADMIN = "ROLE_spexregister_ADMIN";
-    static final String ROLE_EDITOR = "ROLE_spexregister_EDITOR";
-    static final String ROLE_USER = "ROLE_spexregister_USER";
-    static final GrantedAuthoritySid ROLE_ADMIN_SID = new GrantedAuthoritySid(ROLE_ADMIN);
-    static final GrantedAuthoritySid ROLE_EDITOR_SID = new GrantedAuthoritySid(ROLE_EDITOR);
-    static final GrantedAuthoritySid ROLE_USER_SID = new GrantedAuthoritySid(ROLE_USER);
-
     private static final Duration DOWNLOAD_TIMEOUT = Duration.ofSeconds(30);
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
@@ -45,11 +33,9 @@ public class AbstractWriter {
             .build();
 
     final JdbcTemplate jdbcTemplate;
-    final PermissionService permissionService;
 
-    protected AbstractWriter(final JdbcTemplate jdbcTemplate, final PermissionService permissionService) {
+    protected AbstractWriter(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.permissionService = permissionService;
     }
 
     static String escapeSql(String str) {
@@ -78,10 +64,6 @@ public class AbstractWriter {
 
     static String formatTimestamp(final Instant instant) {
         return TIMESTAMP_FORMAT.format(instant);
-    }
-
-    static ObjectIdentity toObjectIdentity(final String clazz, final Serializable id) {
-        return new ObjectIdentityImpl(clazz, id);
     }
 
     void writeImage(final String url, final String ownerTable, final String ownerColumn, final Long ownerId) throws IOException {

@@ -1,14 +1,16 @@
 spring:
+  config:
+    import: optional:configtree:${SPEXREGISTER_SERVER}/.docker/secrets/
   datasource:
     source:
       driver-class-name: com.mysql.jdbc.Driver
-      url: ${SOURCE_DATABASE_URL}
-      username: ${SOURCE_DATABASE_USERNAME}
+      url: ${SOURCE_DATABASE_URL:jdbc:mysql://localhost:3307/spexregister?useSSL=false}
+      username: ${SOURCE_DATABASE_USERNAME:spexregister}
       password: ${SOURCE_DATABASE_PASSWORD}
     target:
-      url: ${TARGET_DATABASE_URL}
-      username: ${TARGET_DATABASE_USERNAME}
-      password: ${TARGET_DATABASE_PASSWORD}
+      url: ${TARGET_DATABASE_URL:jdbc:mysql://localhost:3306/spexregister}
+      username: ${TARGET_DATABASE_USERNAME:spexregister}
+      password: ${TARGET_DATABASE_PASSWORD:${SPEXREGISTER_MYSQL_USER_PASSWORD}}
   shell:
     interactive:
       enabled: true
@@ -16,13 +18,13 @@ spring:
       enabled: true
 spexregister:
   crypto:
-    secret-key: ${SECRET_KEY}
+    secret-key: ${SECRET_KEY:${API_SECRET_KEY}}
   keycloak:
-    url: ${KEYCLOAK_URL}
-    realm: ${KEYCLOAK_REALM}
+    url: ${KEYCLOAK_URL:https://auth.fgv.local.nu:8443/auth}
+    realm: ${KEYCLOAK_REALM:fgv}
     admin:
-      client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
-      client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+      client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:fgv-admin}
+      client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET:${API_KEYCLOAK_ADMIN_CLIENT_SECRET}}
     client:
-      client-id: ${KEYCLOAK_CLIENT_CLIENT_ID}
+      client-id: ${KEYCLOAK_CLIENT_CLIENT_ID:spexregister}
     pending-approval-group: pending-approval

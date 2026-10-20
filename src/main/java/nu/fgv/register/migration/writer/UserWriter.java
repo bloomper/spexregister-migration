@@ -6,7 +6,6 @@ import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
 import nu.fgv.register.migration.model.Spexare;
-import nu.fgv.register.migration.util.PermissionService;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
@@ -17,9 +16,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.domain.PrincipalSid;
-import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -41,10 +37,9 @@ public class UserWriter extends AbstractWriter implements Writer {
     private String pendingApprovalGroup;
 
     protected UserWriter(@Qualifier("targetJdbcTemplate") final JdbcTemplate jdbcTemplate,
-                         final PermissionService permissionService,
                          final Keycloak keycloakAdminClient,
                          final String keycloakClientId) {
-        super(jdbcTemplate, permissionService);
+        super(jdbcTemplate);
         this.keycloakAdminClient = keycloakAdminClient;
         this.keycloakClientId = keycloakClientId;
     }
@@ -153,11 +148,6 @@ public class UserWriter extends AbstractWriter implements Writer {
                                         (%s, '%s', '%s', '%s', '%s', '%s', '%s', 0)""",
                                 t.getId(), externalId, state,
                                 mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
-
-                        final ObjectIdentity oid = toObjectIdentity("nu.fgv.register.server.user.User", t.getId());
-
-                        permissionService.grantPermission(oid, BasePermission.ADMINISTRATION, ROLE_ADMIN_SID);
-                        permissionService.grantPermission(oid, BasePermission.READ, ROLE_ADMIN_SID, new PrincipalSid(externalId));
                     } catch (final Exception e) {
                         keycloakAdminClient.realm(keycloakRealm).users().delete(externalId).close();
                         throw new IllegalStateException("Could not retrieve newly created user %s in Keycloak".formatted(t.getUid()), e);
@@ -176,25 +166,6 @@ public class UserWriter extends AbstractWriter implements Writer {
                                 WHERE id = %s""",
                         t.getSpexareId(), t.getId()))
         );
-
-        jdbcTemplate
-                .query("SELECT u.external_id, s.id, s.partner_id FROM user u JOIN spexare s ON s.id = u.spexare_id",
-                        resultSet -> {
-                            final PrincipalSid sid = new PrincipalSid(resultSet.getString("external_id"));
-                            final long spexareId = resultSet.getLong("id");
-                            final long partnerId = resultSet.getLong("partner_id");
-                            final boolean hasPartner = !resultSet.wasNull();
-
-                            grantReadAndWrite(toObjectIdentity("nu.fgv.register.server.spexare.Spexare", spexareId), sid);
-                            if (hasPartner) {
-                                grantReadAndWrite(toObjectIdentity("nu.fgv.register.server.spexare.Spexare", partnerId), sid);
-                            }
-                        });
-    }
-
-    private void grantReadAndWrite(final ObjectIdentity oid, final PrincipalSid sid) {
-        permissionService.grantPermission(oid, BasePermission.READ, sid);
-        permissionService.grantPermission(oid, BasePermission.WRITE, sid);
     }
 
     private String mapGroup(final String group) {

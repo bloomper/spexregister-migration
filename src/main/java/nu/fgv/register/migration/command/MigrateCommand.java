@@ -20,25 +20,14 @@ import nu.fgv.register.migration.writer.TagWriter;
 import nu.fgv.register.migration.writer.TaskCategoryWriter;
 import nu.fgv.register.migration.writer.TaskWriter;
 import nu.fgv.register.migration.writer.UserWriter;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
-import java.util.List;
 
 @ShellComponent
 @Slf4j
 public class MigrateCommand {
-
-    private static final Authentication SYSTEM_AUTHENTICATION = new UsernamePasswordAuthenticationToken(
-            "system",
-            null,
-            List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
-    );
 
     private final SpexCategoryReader spexCategoryReader;
     private final SpexReader spexReader;
@@ -156,29 +145,24 @@ public class MigrateCommand {
             newsWriter.clean();
             log.info("Done cleaning target database");
 
-            SecurityContextHolder.getContext().setAuthentication(SYSTEM_AUTHENTICATION);
-            try {
-                log.info("Starting to write to target database");
-                log.info("Writing news");
-                newsWriter.write(context);
-                log.info("Writing tags");
-                tagWriter.write(context);
-                log.info("Writing task categories");
-                taskCategoryWriter.write(context);
-                log.info("Writing tasks");
-                taskWriter.write(context);
-                log.info("Writing spex categories");
-                spexCategoryWriter.write(context);
-                log.info("Writing spex");
-                spexWriter.write(context);
-                log.info("Writing spexare");
-                spexareWriter.write(context);
-                log.info("Writing users");
-                userWriter.write(context);
-                log.info("Done writing to target database");
-            } finally {
-                SecurityContextHolder.clearContext();
-            }
+            log.info("Starting to write to target database");
+            log.info("Writing news");
+            newsWriter.write(context);
+            log.info("Writing tags");
+            tagWriter.write(context);
+            log.info("Writing task categories");
+            taskCategoryWriter.write(context);
+            log.info("Writing tasks");
+            taskWriter.write(context);
+            log.info("Writing spex categories");
+            spexCategoryWriter.write(context);
+            log.info("Writing spex");
+            spexWriter.write(context);
+            log.info("Writing spexare");
+            spexareWriter.write(context);
+            log.info("Writing users");
+            userWriter.write(context);
+            log.info("Done writing to target database");
         }
     }
 }
