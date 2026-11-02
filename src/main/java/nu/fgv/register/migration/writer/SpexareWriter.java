@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
 import nu.fgv.register.migration.model.SpexActivity;
 import nu.fgv.register.migration.util.CryptoService;
+import nu.fgv.register.migration.util.Uuids;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -48,10 +49,10 @@ public class SpexareWriter extends AbstractWriter implements Writer {
         context.getSpexare().forEach(t -> {
             jdbcTemplate.execute(String.format("""
                             INSERT INTO spexare
-                            (id, first_name, last_name, nick_name, social_security_number, deceased, published, graduation, comment,
+                            (uuid, id, first_name, last_name, nick_name, social_security_number, deceased, published, graduation, comment,
                              created_by, created_at, last_modified_by, last_modified_at, version) values
-                            (%s, %s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s', 0)""",
-                    t.getId(), quote(escapeSql(nameOrPlaceholder(t.getId(), "first", t.getFirstName()))), quote(escapeSql(nameOrPlaceholder(t.getId(), "last", t.getLastName()))),
+                            ('%s', %s, %s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s', 0)""",
+                    Uuids.v7(), t.getId(), quote(escapeSql(nameOrPlaceholder(t.getId(), "first", t.getFirstName()))), quote(escapeSql(nameOrPlaceholder(t.getId(), "last", t.getLastName()))),
                     hasText(t.getNickName()) ? quote(escapeSql(t.getNickName())) : null, constructSocialSecurityNumber(t.getBirthDate(), t.getSocialSecurityNumber()),
                     t.getDeceased(), t.getPublished(),
                     hasText(t.getGraduation()) ? quote(escapeSql(t.getGraduation())) : null, hasText(t.getComment()) ? quote(escapeSql(t.getComment())) : null,
@@ -69,10 +70,10 @@ public class SpexareWriter extends AbstractWriter implements Writer {
             t.getMemberships().forEach(m ->
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO membership
-                                    (id, year, type_id, spexare_id,
+                                    (uuid, id, year, type_id, spexare_id,
                                      created_by, created_at, last_modified_by, last_modified_at, version) values
-                                    (%s, '%s', '%s', %s, '%s', '%s', '%s', '%s', 0)""",
-                            m.getId(), m.getYear(), m.getType().getId(), t.getId(),
+                                    ('%s', %s, '%s', '%s', %s, '%s', '%s', '%s', '%s', 0)""",
+                            Uuids.v7(), m.getId(), m.getYear(), m.getType().getId(), t.getId(),
                             mapUser(context.getUsers(), m.getCreatedBy()), formatTimestamp(m.getCreatedAt()), mapUser(context.getUsers(), m.getLastModifiedBy()), formatTimestamp(m.getLastModifiedAt())))
             );
 
@@ -80,10 +81,10 @@ public class SpexareWriter extends AbstractWriter implements Writer {
             t.getAddresses().forEach(a ->
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO address
-                                    (street_address, postal_code, city, country, phone, phone_mobile, email_address, type_id, spexare_id,
+                                    (uuid, street_address, postal_code, city, country, phone, phone_mobile, email_address, type_id, spexare_id,
                                      created_by, created_at, last_modified_by, last_modified_at, version) values
-                                    (%s, %s, %s, %s, %s, %s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
-                            hasText(a.getStreetAddress()) ? quote(escapeSql(a.getStreetAddress())) : null, hasText(a.getPostalCode()) ? quote(escapeSql(a.getPostalCode())) : null,
+                                    ('%s', %s, %s, %s, %s, %s, %s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
+                            Uuids.v7(), hasText(a.getStreetAddress()) ? quote(escapeSql(a.getStreetAddress())) : null, hasText(a.getPostalCode()) ? quote(escapeSql(a.getPostalCode())) : null,
                             hasText(a.getCity()) ? quote(escapeSql(a.getCity())) : null, hasText(a.getCountry()) ? quote(escapeSql(a.getCountry())) : null,
                             hasText(a.getPhone()) ? quote(escapeSql(a.getPhone())) : null, hasText(a.getPhoneMobile()) ? quote(escapeSql(a.getPhoneMobile())) : null,
                             hasText(a.getEmailAddress()) ? quote(escapeSql(a.getEmailAddress())) : null, a.getType().getId(), t.getId(),
@@ -94,10 +95,10 @@ public class SpexareWriter extends AbstractWriter implements Writer {
             t.getConsents().forEach(c ->
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO consent
-                                    (id, value, type_id, spexare_id,
+                                    (uuid, id, value, type_id, spexare_id,
                                      created_by, created_at, last_modified_by, last_modified_at, version) values
-                                    (%s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
-                            c.getId(), c.getValue(), c.getType().getId(), t.getId(),
+                                    ('%s', %s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
+                            Uuids.v7(), c.getId(), c.getValue(), c.getType().getId(), t.getId(),
                             mapUser(context.getUsers(), c.getCreatedBy()), formatTimestamp(c.getCreatedAt()), mapUser(context.getUsers(), c.getLastModifiedBy()), formatTimestamp(c.getLastModifiedAt())))
             );
 
@@ -105,10 +106,10 @@ public class SpexareWriter extends AbstractWriter implements Writer {
             t.getToggles().forEach(g ->
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO toggle
-                                    (id, value, type_id, spexare_id,
+                                    (uuid, id, value, type_id, spexare_id,
                                      created_by, created_at, last_modified_by, last_modified_at, version) values
-                                    (%s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
-                            g.getId(), g.getValue(), g.getType().getId(), t.getId(),
+                                    ('%s', %s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
+                            Uuids.v7(), g.getId(), g.getValue(), g.getType().getId(), t.getId(),
                             mapUser(context.getUsers(), g.getCreatedBy()), formatTimestamp(g.getCreatedAt()), mapUser(context.getUsers(), g.getLastModifiedBy()), formatTimestamp(g.getLastModifiedAt())))
             );
 
@@ -125,10 +126,10 @@ public class SpexareWriter extends AbstractWriter implements Writer {
             t.getActivities().forEach(a -> {
                 jdbcTemplate.execute(String.format("""
                                 INSERT INTO activity
-                                (id, spexare_id,
+                                (uuid, id, spexare_id,
                                  created_by, created_at, last_modified_by, last_modified_at, version) values
-                                (%s, %s, '%s', '%s', '%s', '%s', 0)""",
-                        a.getId(), a.getSpexare().getId(),
+                                ('%s', %s, %s, '%s', '%s', '%s', '%s', 0)""",
+                        Uuids.v7(), a.getId(), a.getSpexare().getId(),
                         mapUser(context.getUsers(), a.getCreatedBy()), formatTimestamp(a.getCreatedAt()), mapUser(context.getUsers(), a.getLastModifiedBy()), formatTimestamp(a.getLastModifiedAt())));
 
                 // Spex activity
@@ -137,10 +138,10 @@ public class SpexareWriter extends AbstractWriter implements Writer {
 
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO spex_activity
-                                    (id, activity_id, spex_id,
+                                    (uuid, id, activity_id, spex_id,
                                      created_by, created_at, last_modified_by, last_modified_at, version) values
-                                    (%s, %s, %s, '%s', '%s', '%s', '%s', 0)""",
-                            sa.getId(), a.getId(), sa.getSpex().getId(),
+                                    ('%s', %s, %s, %s, '%s', '%s', '%s', '%s', 0)""",
+                            Uuids.v7(), sa.getId(), a.getId(), sa.getSpex().getId(),
                             mapUser(context.getUsers(), sa.getCreatedBy()), formatTimestamp(sa.getCreatedAt()), mapUser(context.getUsers(), sa.getLastModifiedBy()), formatTimestamp(sa.getLastModifiedAt())));
                 }
 
@@ -148,20 +149,20 @@ public class SpexareWriter extends AbstractWriter implements Writer {
                 a.getTaskActivities().forEach(ta -> {
                     jdbcTemplate.execute(String.format("""
                                     INSERT INTO task_activity
-                                    (id, activity_id, task_id,
+                                    (uuid, id, activity_id, task_id,
                                      created_by, created_at, last_modified_by, last_modified_at, version) values
-                                    (%s, %s, %s, '%s', '%s', '%s', '%s', 0)""",
-                            ta.getId(), a.getId(), ta.getTask().getId(),
+                                    ('%s', %s, %s, %s, '%s', '%s', '%s', '%s', 0)""",
+                            Uuids.v7(), ta.getId(), a.getId(), ta.getTask().getId(),
                             mapUser(context.getUsers(), ta.getCreatedBy()), formatTimestamp(ta.getCreatedAt()), mapUser(context.getUsers(), ta.getLastModifiedBy()), formatTimestamp(ta.getLastModifiedAt())));
 
                     // Actors
                     ta.getActors().forEach(ac ->
                             jdbcTemplate.execute(String.format("""
                                             INSERT INTO actor
-                                            (id, role, vocal_id, task_activity_id,
+                                            (uuid, id, role, vocal_id, task_activity_id,
                                              created_by, created_at, last_modified_by, last_modified_at, version) values
-                                            (%s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
-                                    ac.getId(), hasText(ac.getRole()) ? quote(escapeSql(ac.getRole())) : null, ac.getVocal().getId(), ta.getId(),
+                                            ('%s', %s, %s, '%s', %s, '%s', '%s', '%s', '%s', 0)""",
+                                    Uuids.v7(), ac.getId(), hasText(ac.getRole()) ? quote(escapeSql(ac.getRole())) : null, ac.getVocal().getId(), ta.getId(),
                                     mapUser(context.getUsers(), ac.getCreatedBy()), formatTimestamp(ac.getCreatedAt()), mapUser(context.getUsers(), ac.getLastModifiedBy()), formatTimestamp(ac.getLastModifiedAt()))));
                 });
             });
