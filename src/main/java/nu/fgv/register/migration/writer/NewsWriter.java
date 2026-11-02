@@ -1,6 +1,7 @@
 package nu.fgv.register.migration.writer;
 
 import nu.fgv.register.migration.MigrationContext;
+import nu.fgv.register.migration.util.Uuids;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -24,10 +25,10 @@ public class NewsWriter extends AbstractWriter implements Writer {
         context.getNews().forEach(t -> {
             jdbcTemplate.execute(String.format("""
                             INSERT INTO news
-                            (id, subject, text, visible_from, published, created_by, created_at, last_modified_by, last_modified_at, version)
+                            (uuid, id, subject, text, visible_from, published, created_by, created_at, last_modified_by, last_modified_at, version)
                             values
-                            (%s, '%s', '%s', '%s', 1, '%s', '%s', '%s', '%s', 0)""",
-                    t.getId(), escapeSql(t.getSubject()), escapeSql(t.getText()), t.getVisibleFrom(),
+                            ('%s', %s, '%s', '%s', '%s', 1, '%s', '%s', '%s', '%s', 0)""",
+                    Uuids.v7(), t.getId(), escapeSql(t.getSubject()), escapeSql(t.getText()), t.getVisibleFrom(),
                     mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
         });
     }

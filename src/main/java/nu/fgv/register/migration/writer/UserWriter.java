@@ -6,6 +6,7 @@ import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import nu.fgv.register.migration.MigrationContext;
 import nu.fgv.register.migration.model.Spexare;
+import nu.fgv.register.migration.util.Uuids;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
@@ -143,10 +144,10 @@ public class UserWriter extends AbstractWriter implements Writer {
 
                         jdbcTemplate.execute(String.format("""
                                         INSERT INTO user
-                                        (id, external_id, state_id, created_by, created_at, last_modified_by, last_modified_at, version)
+                                        (uuid, id, external_id, state_id, created_by, created_at, last_modified_by, last_modified_at, version)
                                         values
-                                        (%s, '%s', '%s', '%s', '%s', '%s', '%s', 0)""",
-                                t.getId(), externalId, state,
+                                        ('%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', 0)""",
+                                Uuids.v7(), t.getId(), externalId, state,
                                 mapUser(context.getUsers(), t.getCreatedBy()), formatTimestamp(t.getCreatedAt()), mapUser(context.getUsers(), t.getLastModifiedBy()), formatTimestamp(t.getLastModifiedAt())));
                     } catch (final Exception e) {
                         keycloakAdminClient.realm(keycloakRealm).users().delete(externalId).close();
